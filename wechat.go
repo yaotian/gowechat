@@ -29,11 +29,14 @@ type Config struct {
 	EncodingAESKey string
 	Cache          cache.Cache
 
+	//mch商户平台需要的变量
 	//证书
 	SslCertFilePath string //证书文件的路径
 	SslKeyFilePath  string
 	SslCertContent  string //证书的内容
 	SslKeyContent   string
+	MchID           string
+	MchAPIKey       string //商户平台设置的api key
 }
 
 // NewWechat init
@@ -68,6 +71,9 @@ func initContext(cfg *Config, context *context.Context) {
 			context.SHTTPClient = client
 		}
 	}
+
+	context.MchAPIKey = cfg.MchAPIKey
+	context.MchID = cfg.MchID
 }
 
 // GetServer 消息管理

@@ -27,6 +27,10 @@ type Context struct {
 
 	HTTPClient  *http.Client
 	SHTTPClient *http.Client //SSL client
+
+	//商户平台APIKey
+	MchAPIKey string
+	MchID     string
 }
 
 // Query returns the keyed url query value if it exists
