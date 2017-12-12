@@ -16,6 +16,8 @@ import (
 	"github.com/yaotian/gowechat/server"
 )
 
+var Cache cache.Cache
+
 // Wechat struct
 type Wechat struct {
 	Context *context.Context
@@ -34,6 +36,9 @@ type Config struct {
 func NewWechat(cfg *Config) *Wechat {
 	context := new(context.Context)
 	copyConfigToContext(cfg, context)
+	if cfg.Cache == nil {
+		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
+	}
 	return &Wechat{context}
 }
 
