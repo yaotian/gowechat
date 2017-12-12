@@ -13,6 +13,7 @@ import (
 	"github.com/yaotian/gowechat/server"
 	"github.com/yaotian/gowechat/server/context"
 	"github.com/yaotian/gowechat/server/oauth"
+	"github.com/yaotian/gowechat/util"
 )
 
 // Wechat struct
@@ -27,26 +28,46 @@ type Config struct {
 	Token          string
 	EncodingAESKey string
 	Cache          cache.Cache
+
+	//证书
+	SslCertFilePath string //证书文件的路径
+	SslKeyFilePath  string
+	SslCertContent  string //证书的内容
+	SslKeyContent   string
 }
 
 // NewWechat init
 func NewWechat(cfg *Config) *Wechat {
 	context := new(context.Context)
-	copyConfigToContext(cfg, context)
-	if cfg.Cache == nil {
-		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
-	}
+	initContext(cfg, context)
 	return &Wechat{context}
 }
 
-func copyConfigToContext(cfg *Config, context *context.Context) {
+func initContext(cfg *Config, context *context.Context) {
 	context.AppID = cfg.AppID
 	context.AppSecret = cfg.AppSecret
 	context.Token = cfg.Token
 	context.EncodingAESKey = cfg.EncodingAESKey
-	context.Cache = cfg.Cache
+
+	if cfg.Cache == nil {
+		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
+	}
+
 	context.SetAccessTokenLock(new(sync.RWMutex))
 	context.SetJsAPITicketLock(new(sync.RWMutex))
+
+	//create http client
+	if cfg.SslCertFilePath != "" && cfg.SslKeyFilePath != "" {
+		if client, err := util.NewTLSHttpClient(cfg.SslCertFilePath, cfg.SslKeyFilePath); err == nil {
+			context.SHTTPClient = client
+		}
+	}
+
+	if cfg.SslCertContent != "" && cfg.SslKeyContent != "" {
+		if client, err := util.NewTLSHttpClientFromContent(cfg.SslCertContent, cfg.SslKeyContent); err == nil {
+			context.SHTTPClient = client
+		}
+	}
 }
 
 // GetServer 消息管理

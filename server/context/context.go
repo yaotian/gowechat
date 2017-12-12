@@ -24,6 +24,9 @@ type Context struct {
 
 	//jsAPITicket 读写锁 同一个AppID一个
 	jsAPITicketLock *sync.RWMutex
+
+	HTTPClient  *http.Client
+	SHTTPClient *http.Client //SSL client
 }
 
 // Query returns the keyed url query value if it exists

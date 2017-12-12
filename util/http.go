@@ -2,13 +2,16 @@ package util
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"os"
+	"time"
 )
 
 //HTTPGet get 请求
@@ -118,5 +121,55 @@ func PostMultipartForm(fields []MultipartFormField, uri string) (respBody []byte
 		return nil, err
 	}
 	respBody, err = ioutil.ReadAll(resp.Body)
+	return
+}
+
+//NewTLSHttpClientFromContent  创建支持双向证书认证的 http.Client, certContent keyContent为证书或key的内容
+func NewTLSHttpClientFromContent(certContent, keyContent string) (httpClient *http.Client, err error) {
+	cert, err := tls.X509KeyPair([]byte(certContent), []byte(keyContent))
+	if err != nil {
+		return
+	}
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+	}
+
+	httpClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			Dial: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).Dial,
+			TLSHandshakeTimeout: 10 * time.Second,
+			TLSClientConfig:     tlsConfig,
+		},
+		Timeout: 60 * time.Second,
+	}
+	return
+}
+
+// NewTLSHttpClient 创建支持双向证书认证的 http.Client
+func NewTLSHttpClient(certFile, keyFile string) (httpClient *http.Client, err error) {
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return
+	}
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+	}
+
+	httpClient = &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			Dial: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).Dial,
+			TLSHandshakeTimeout: 10 * time.Second,
+			TLSClientConfig:     tlsConfig,
+		},
+		Timeout: 60 * time.Second,
+	}
 	return
 }
