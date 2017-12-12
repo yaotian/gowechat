@@ -1,4 +1,4 @@
-# GoWechat,简单易用的微信API
+# GoWechat - 简单易用的微信API
 
 
 ## 支持微信以下的平台
