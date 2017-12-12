@@ -4,19 +4,16 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/astaxie/beego/cache"
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
 	"github.com/yaotian/gowechat/mp/menu"
 	"github.com/yaotian/gowechat/mp/template"
 	"github.com/yaotian/gowechat/mp/user"
+	"github.com/yaotian/gowechat/server"
 	"github.com/yaotian/gowechat/server/context"
 	"github.com/yaotian/gowechat/server/oauth"
-
-	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/server"
 )
-
-var Cache cache.Cache
 
 // Wechat struct
 type Wechat struct {
