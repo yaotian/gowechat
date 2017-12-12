@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/cache"
+	"github.com/yaotian/gowechat/mch/pay"
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
 	"github.com/yaotian/gowechat/mp/menu"
@@ -116,4 +117,9 @@ func (wc *Wechat) GetUser() *user.User {
 // GetTemplate 模板消息接口
 func (wc *Wechat) GetTemplate() *template.Template {
 	return template.NewTemplate(wc.Context)
+}
+
+//GetPay get pay
+func (wc *Wechat) GetPay() *pay.Pay {
+	return pay.NewPay(wc.Context)
 }
