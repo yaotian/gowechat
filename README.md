@@ -1,5 +1,7 @@
-# GoWechat: Golang api of wechat
+# GoWechat,简单易用的微信API
 
+
+## 支持微信以下的平台
 
 目录| 对应 |
 ----|------|
