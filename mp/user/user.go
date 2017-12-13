@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/yaotian/gowechat/mp/base"
 	"github.com/yaotian/gowechat/server/context"
 	"github.com/yaotian/gowechat/util"
 )
@@ -14,7 +15,7 @@ const (
 
 //User 用户管理
 type User struct {
-	*context.Context
+	base.MpBase
 }
 
 //NewUser 实例化
@@ -46,26 +47,13 @@ type Info struct {
 
 //GetUserInfo 获取用户基本信息
 func (user *User) GetUserInfo(openID string) (userInfo *Info, err error) {
-	var accessToken string
-	accessToken, err = user.GetAccessToken()
-	if err != nil {
-		return
-	}
-
-	uri := fmt.Sprintf("%s?access_token=%s&openid=%s&lang=zh_CN", userInfoURL, accessToken, openID)
+	url := fmt.Sprintf("%s?openid=%s&lang=zh_CN", userInfoURL, openID)
 	var response []byte
-	response, err = util.HTTPGet(uri)
+	response, err = user.HTTPGetWithAccessToken(url)
 	if err != nil {
 		return
 	}
 	userInfo = new(Info)
 	err = json.Unmarshal(response, userInfo)
-	if err != nil {
-		return
-	}
-	if userInfo.ErrCode != 0 {
-		err = fmt.Errorf("GetUserInfo Error , errcode=%d , errmsg=%s", userInfo.ErrCode, userInfo.ErrMsg)
-		return
-	}
 	return
 }

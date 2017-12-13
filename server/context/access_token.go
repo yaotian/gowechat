@@ -50,6 +50,12 @@ func (ctx *Context) GetAccessToken() (accessToken string, err error) {
 	return
 }
 
+//CleanAccessTokenCache clean cache
+func (ctx *Context) CleanAccessTokenCache() {
+	accessTokenCacheKey := fmt.Sprintf("access_token_%s", ctx.AppID)
+	ctx.Cache.Delete(accessTokenCacheKey)
+}
+
 //GetAccessTokenFromServer 强制从微信服务器获取token
 func (ctx *Context) GetAccessTokenFromServer() (resAccessToken ResAccessToken, err error) {
 	url := fmt.Sprintf("%s?grant_type=client_credential&appid=%s&secret=%s", AccessTokenURL, ctx.AppID, ctx.AppSecret)

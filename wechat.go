@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/mch/pay"
 	"github.com/yaotian/gowechat/server"
 	"github.com/yaotian/gowechat/server/context"
 	"github.com/yaotian/gowechat/util"
@@ -76,9 +75,4 @@ func (wc *Wechat) GetServer(req *http.Request, writer http.ResponseWriter) *serv
 	wc.Context.Request = req
 	wc.Context.Writer = writer
 	return server.NewServer(wc.Context)
-}
-
-//GetPay get pay
-func (wc *Wechat) GetPay() *pay.Pay {
-	return pay.NewPay(wc.Context)
 }

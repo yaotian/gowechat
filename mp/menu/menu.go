@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/yaotian/gowechat/mp/base"
 	"github.com/yaotian/gowechat/server/context"
 	"github.com/yaotian/gowechat/util"
 )
@@ -20,7 +21,7 @@ const (
 
 //Menu struct
 type Menu struct {
-	*context.Context
+	base.MpBase
 }
 
 //reqMenu 设置菜单请求数据
@@ -147,48 +148,19 @@ func (menu *Menu) SetMenu(buttons []*Button) error {
 
 //GetMenu 获取菜单配置
 func (menu *Menu) GetMenu() (resMenu ResMenu, err error) {
-	var accessToken string
-	accessToken, err = menu.GetAccessToken()
-	if err != nil {
-		return
-	}
-	uri := fmt.Sprintf("%s?access_token=%s", menuGetURL, accessToken)
 	var response []byte
-	response, err = util.HTTPGet(uri)
+	response, err = menu.HTTPGetWithAccessToken(menuGetURL)
 	if err != nil {
 		return
 	}
 	err = json.Unmarshal(response, &resMenu)
-	if err != nil {
-		return
-	}
-	if resMenu.ErrCode != 0 {
-		err = fmt.Errorf("GetMenu Error , errcode=%d , errmsg=%s", resMenu.ErrCode, resMenu.ErrMsg)
-		return
-	}
 	return
 }
 
 //DeleteMenu 删除菜单
-func (menu *Menu) DeleteMenu() error {
-	accessToken, err := menu.GetAccessToken()
-	if err != nil {
-		return err
-	}
-	uri := fmt.Sprintf("%s?access_token=%s", menuDeleteURL, accessToken)
-	response, err := util.HTTPGet(uri)
-	if err != nil {
-		return err
-	}
-	var commError util.CommonError
-	err = json.Unmarshal(response, &commError)
-	if err != nil {
-		return err
-	}
-	if commError.ErrCode != 0 {
-		return fmt.Errorf("GetMenu Error , errcode=%d , errmsg=%s", commError.ErrCode, commError.ErrMsg)
-	}
-	return nil
+func (menu *Menu) DeleteMenu() (err error) {
+	_, err = menu.HTTPGetWithAccessToken(menuDeleteURL)
+	return
 }
 
 //AddConditional 添加个性化菜单
@@ -275,25 +247,11 @@ func (menu *Menu) MenuTryMatch(userID string) (buttons []Button, err error) {
 
 //GetCurrentSelfMenuInfo 获取自定义菜单配置接口
 func (menu *Menu) GetCurrentSelfMenuInfo() (resSelfMenuInfo ResSelfMenuInfo, err error) {
-	var accessToken string
-	accessToken, err = menu.GetAccessToken()
-	if err != nil {
-		return
-	}
-	uri := fmt.Sprintf("%s?access_token=%s", menuSelfMenuInfoURL, accessToken)
 	var response []byte
-	response, err = util.HTTPGet(uri)
+	response, err = menu.HTTPGetWithAccessToken(menuSelfMenuInfoURL)
 	if err != nil {
 		return
 	}
-	fmt.Println(string(response))
 	err = json.Unmarshal(response, &resSelfMenuInfo)
-	if err != nil {
-		return
-	}
-	if resSelfMenuInfo.ErrCode != 0 {
-		err = fmt.Errorf("GetCurrentSelfMenuInfo Error , errcode=%d , errmsg=%s", resSelfMenuInfo.ErrCode, resSelfMenuInfo.ErrMsg)
-		return
-	}
 	return
 }
