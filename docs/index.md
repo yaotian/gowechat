@@ -10,4 +10,4 @@
 /open| 微信开放平台|   [文档](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&lang=zh_CN) |
 /corp | 微信企业号  | [文档](http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5) |
 
-## [开发文档](./doc.html)
+## [使用文档](./doc.html)

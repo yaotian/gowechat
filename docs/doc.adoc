@@ -1,4 +1,4 @@
-= GoWechat开发文档
+= GoWechat使用文档
 :toc: left
 
 [[install,安装]]
