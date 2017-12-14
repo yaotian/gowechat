@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"runtime/debug"
 	"strconv"
+	"strings"
 
 	"github.com/yaotian/gowechat/mp/message"
 	"github.com/yaotian/gowechat/server/context"
@@ -42,25 +43,28 @@ func NewServer(context *context.Context) *Server {
 
 //Serve 处理微信的请求消息
 func (srv *Server) Serve() error {
-	if !srv.Validate() {
-		return fmt.Errorf("请求校验失败")
-	}
+	if strings.ToLower(srv.Context.Request.Method) == "get" {
+		if !srv.Validate() {
+			return fmt.Errorf("请求校验失败")
+		}
 
-	echostr, exists := srv.GetQuery("echostr")
-	if exists {
-		srv.String(echostr)
+		echostr, exists := srv.GetQuery("echostr")
+		if exists {
+			srv.String(echostr)
+		}
 		return nil
 	}
 
-	response, err := srv.handleRequest()
-	if err != nil {
-		return err
+	if strings.ToLower(srv.Context.Request.Method) == "post" {
+		replyMsg, err := srv.handleRequest()
+		if err != nil {
+			return err
+		}
+		//debug
+		//fmt.Println("request msg = ", string(srv.requestRawXMLMsg))
+		return srv.buildResponse(replyMsg)
 	}
-
-	//debug
-	//fmt.Println("request msg = ", string(srv.requestRawXMLMsg))
-
-	return srv.buildResponse(response)
+	return nil
 }
 
 //Validate 校验请求是否合法

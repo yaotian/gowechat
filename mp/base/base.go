@@ -10,12 +10,13 @@ import (
 	"github.com/yaotian/gowechat/util"
 )
 
-//MpBase 微信公众号
+//MpBase 微信公众平台,基本类
 type MpBase struct {
 	*context.Context
 }
 
-//HTTPGetWithAccessToken http get
+//HTTPGetWithAccessToken 微信公众平台中，自动加上access_token变量的GET调用，
+//如果失败，会清空AccessToken cache, 再试一次
 func (c *MpBase) HTTPGetWithAccessToken(url string) (resp []byte, err error) {
 	retry := 1
 Do:

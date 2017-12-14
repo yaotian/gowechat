@@ -6,9 +6,9 @@ import (
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
 	"github.com/yaotian/gowechat/mp/menu"
+	"github.com/yaotian/gowechat/mp/oauth"
 	"github.com/yaotian/gowechat/mp/template"
 	"github.com/yaotian/gowechat/mp/user"
-	"github.com/yaotian/gowechat/server/oauth"
 )
 
 //GetAccessToken 获取access_token
