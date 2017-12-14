@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/yaotian/gowechat/mp/base"
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const (
@@ -19,7 +19,7 @@ type User struct {
 }
 
 //NewUser 实例化
-func NewUser(context *context.Context) *User {
+func NewUser(context *wxcontext.Context) *User {
 	user := new(User)
 	user.Context = context
 	return user

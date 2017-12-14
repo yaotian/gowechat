@@ -7,12 +7,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/yaotian/gowechat/context"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 //MchBase base mch
 type MchBase struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 //PostXML postXML

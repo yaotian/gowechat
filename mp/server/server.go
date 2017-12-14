@@ -10,14 +10,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/mp/message"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 //Server struct
 type Server struct {
-	*context.Context
+	*wxcontext.Context
 
 	openID string
 
@@ -35,7 +35,7 @@ type Server struct {
 }
 
 //NewServer init
-func NewServer(context *context.Context) *Server {
+func NewServer(context *wxcontext.Context) *Server {
 	srv := new(Server)
 	srv.Context = context
 	return srv

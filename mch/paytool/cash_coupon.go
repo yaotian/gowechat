@@ -2,7 +2,7 @@ package paytool
 
 import (
 	"github.com/yaotian/gowechat/mch/base"
-	"github.com/yaotian/gowechat/context"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 //PayTool pay tool
@@ -11,7 +11,7 @@ type PayTool struct {
 }
 
 //NewPayTool 实例化
-func NewPayTool(context *context.Context) *PayTool {
+func NewPayTool(context *wxcontext.Context) *PayTool {
 	payT := new(PayTool)
 	payT.Context = context
 	return payT

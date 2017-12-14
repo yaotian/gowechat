@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const (
@@ -14,11 +14,11 @@ const (
 
 //Template 模板消息
 type Template struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 //NewTemplate 实例化
-func NewTemplate(context *context.Context) *Template {
+func NewTemplate(context *wxcontext.Context) *Template {
 	tpl := new(Template)
 	tpl.Context = context
 	return tpl

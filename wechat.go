@@ -1,3 +1,5 @@
+//GoWechat
+//
 package gowechat
 
 import (
@@ -5,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/context"
+	"github.com/yaotian/gowechat/wxcontext"
 	"github.com/yaotian/gowechat/util"
 )
 
@@ -64,6 +66,15 @@ func (wc *Wechat) Mp() (mp *MpMgr, err error) {
 
 //checkCfgBase 检查配置基本信息
 func (wc *Wechat) checkCfgBase() (err error) {
+	if wc.Context.AppID == "" {
+		return fmt.Errorf("%s", "配置中没有AppID")
+	}
+	if wc.Context.AppSecret == "" {
+		return fmt.Errorf("%s", "配置中没有AppSecret")
+	}
+	if wc.Context.Token == "" {
+		return fmt.Errorf("%s", "配置中没有Token")
+	}
 	return
 }
 
@@ -72,8 +83,17 @@ func (wc *Wechat) checkCfgMch() (err error) {
 	if err != nil {
 		return
 	}
-	if wc.Context.MchID == "" || wc.Context.MchAPIKey == "" {
-		return fmt.Errorf("%s", "配置中没有MchID或者MchAPIKey")
+	if wc.Context.MchID == "" {
+		return fmt.Errorf("%s", "配置中没有MchID")
+	}
+	if wc.Context.MchAPIKey == "" {
+		return fmt.Errorf("%s", "配置中没有MchAPIKey")
+	}
+	if wc.Context.SslCertFilePath == "" || wc.Context.SslCertContent == "" {
+		return fmt.Errorf("%s", "配置中没有SslCert")
+	}
+	if wc.Context.SslKeyFilePath == "" || wc.Context.SslKeyContent == "" {
+		return fmt.Errorf("%s", "配置中没有SslKey")
 	}
 	return
 }

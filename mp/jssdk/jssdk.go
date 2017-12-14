@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const getTicketURL = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi"
 
 // Js struct
 type Js struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 // Config 返回给用户jssdk配置信息
@@ -33,7 +33,7 @@ type resTicket struct {
 }
 
 //NewJs init
-func NewJs(context *context.Context) *Js {
+func NewJs(context *wxcontext.Context) *Js {
 	js := new(Js)
 	js.Context = context
 	return js

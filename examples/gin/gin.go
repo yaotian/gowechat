@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yaotian/gowechat"
-	gcontext "github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/mp/message"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 func hello(c *gin.Context) {
 
 	//配置微信参数
-	config := gcontext.Config{
+	config := wxcontext.Config{
 		AppID:          "your app id",
 		AppSecret:      "your app secret",
 		Token:          "your token",

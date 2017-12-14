@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 //MpBase 微信公众平台,基本类
 type MpBase struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 //HTTPGetWithAccessToken 微信公众平台中，自动加上access_token变量的GET调用，

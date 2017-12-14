@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const (
@@ -20,11 +20,11 @@ const (
 
 //Oauth 保存用户授权信息
 type Oauth struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 //NewOauth 实例化授权信息
-func NewOauth(context *context.Context) *Oauth {
+func NewOauth(context *wxcontext.Context) *Oauth {
 	auth := new(Oauth)
 	auth.Context = context
 	return auth

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/yaotian/gowechat/mp/base"
-	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const (
@@ -113,7 +113,7 @@ type MatchRule struct {
 }
 
 //NewMenu 实例
-func NewMenu(context *context.Context) *Menu {
+func NewMenu(context *wxcontext.Context) *Menu {
 	menu := new(Menu)
 	menu.Context = context
 	return menu

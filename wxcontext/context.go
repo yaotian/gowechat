@@ -1,4 +1,4 @@
-package context
+package wxcontext
 
 import (
 	"net/http"

@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/yaotian/gowechat"
-	gcontext "github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/mp/message"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 func hello(rw http.ResponseWriter, req *http.Request) {
 
 	//配置微信参数
-	config := gcontext.Config{
+	config := wxcontext.Config{
 		AppID:          "your app id",
 		AppSecret:      "your app secret",
 		Token:          "your token",
