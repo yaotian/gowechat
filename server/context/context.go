@@ -9,10 +9,11 @@ import (
 
 // Context struct
 type Context struct {
-	AppID          string
-	AppSecret      string
-	Token          string
-	EncodingAESKey string
+	Config
+	// AppID          string
+	// AppSecret      string
+	// Token          string
+	// EncodingAESKey string
 
 	Cache cache.Cache
 
@@ -28,9 +29,9 @@ type Context struct {
 	HTTPClient  *http.Client
 	SHTTPClient *http.Client //SSL client
 
-	//商户平台APIKey
-	MchAPIKey string
-	MchID     string
+	// //商户平台APIKey
+	// MchAPIKey string
+	// MchID     string
 }
 
 // Query returns the keyed url query value if it exists

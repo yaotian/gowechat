@@ -11,37 +11,42 @@ import (
 	"github.com/yaotian/gowechat/mp/user"
 )
 
+//MpMgr mp mgr
+type MpMgr struct {
+	Wechat
+}
+
 //GetAccessToken 获取access_token
-func (wc *Wechat) GetAccessToken() (string, error) {
-	return wc.Context.GetAccessToken()
+func (c *MpMgr) GetAccessToken() (string, error) {
+	return c.Context.GetAccessToken()
 }
 
 // GetOauth oauth2网页授权
-func (wc *Wechat) GetOauth() *oauth.Oauth {
-	return oauth.NewOauth(wc.Context)
+func (c *MpMgr) GetOauth() *oauth.Oauth {
+	return oauth.NewOauth(c.Context)
 }
 
 // GetMaterial 素材管理
-func (wc *Wechat) GetMaterial() *material.Material {
-	return material.NewMaterial(wc.Context)
+func (c *MpMgr) GetMaterial() *material.Material {
+	return material.NewMaterial(c.Context)
 }
 
 // GetJs js-sdk配置
-func (wc *Wechat) GetJs() *jssdk.Js {
-	return jssdk.NewJs(wc.Context)
+func (c *MpMgr) GetJs() *jssdk.Js {
+	return jssdk.NewJs(c.Context)
 }
 
 // GetMenu 菜单管理接口
-func (wc *Wechat) GetMenu() *menu.Menu {
-	return menu.NewMenu(wc.Context)
+func (c *MpMgr) GetMenu() *menu.Menu {
+	return menu.NewMenu(c.Context)
 }
 
 // GetUser 用户管理接口
-func (wc *Wechat) GetUser() *user.User {
-	return user.NewUser(wc.Context)
+func (c *MpMgr) GetUser() *user.User {
+	return user.NewUser(c.Context)
 }
 
 // GetTemplate 模板消息接口
-func (wc *Wechat) GetTemplate() *template.Template {
-	return template.NewTemplate(wc.Context)
+func (c *MpMgr) GetTemplate() *template.Template {
+	return template.NewTemplate(c.Context)
 }

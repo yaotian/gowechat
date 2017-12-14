@@ -7,11 +7,12 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/yaotian/gowechat"
 	"github.com/yaotian/gowechat/mp/message"
+	gcontext "github.com/yaotian/gowechat/server/context"
 )
 
 func hello(ctx *context.Context) {
 	//配置微信参数
-	config := &gowechat.Config{
+	config := gcontext.Config{
 		AppID:          "your app id",
 		AppSecret:      "your app secret",
 		Token:          "your token",

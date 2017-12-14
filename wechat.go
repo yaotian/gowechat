@@ -1,6 +1,7 @@
 package gowechat
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -15,40 +16,18 @@ type Wechat struct {
 	Context *context.Context
 }
 
-// Config for user
-type Config struct {
-	AppID          string
-	AppSecret      string
-	Token          string
-	EncodingAESKey string
-	Cache          cache.Cache
-
-	//mch商户平台需要的变量
-	//证书
-	SslCertFilePath string //证书文件的路径
-	SslKeyFilePath  string
-	SslCertContent  string //证书的内容
-	SslKeyContent   string
-	MchID           string
-	MchAPIKey       string //商户平台设置的api key
-}
-
 // NewWechat init
-func NewWechat(cfg *Config) *Wechat {
+func NewWechat(cfg context.Config) *Wechat {
 	context := new(context.Context)
 	initContext(cfg, context)
 	return &Wechat{context}
 }
 
-func initContext(cfg *Config, context *context.Context) {
-	context.AppID = cfg.AppID
-	context.AppSecret = cfg.AppSecret
-	context.Token = cfg.Token
-	context.EncodingAESKey = cfg.EncodingAESKey
-
+func initContext(cfg context.Config, context *context.Context) {
 	if cfg.Cache == nil {
 		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
 	}
+	context.Config = cfg
 
 	context.SetAccessTokenLock(new(sync.RWMutex))
 	context.SetJsAPITicketLock(new(sync.RWMutex))
@@ -65,9 +44,6 @@ func initContext(cfg *Config, context *context.Context) {
 			context.SHTTPClient = client
 		}
 	}
-
-	context.MchAPIKey = cfg.MchAPIKey
-	context.MchID = cfg.MchID
 }
 
 // GetServer 消息管理
@@ -75,4 +51,38 @@ func (wc *Wechat) GetServer(req *http.Request, writer http.ResponseWriter) *serv
 	wc.Context.Request = req
 	wc.Context.Writer = writer
 	return server.NewServer(wc.Context)
+}
+
+//Mch 商户平台
+func (wc *Wechat) Mch() (mch *MchMgr, err error) {
+	mch = new(MchMgr)
+	mch.Wechat = *wc
+	return
+}
+
+//Mp 公众平台
+func (wc *Wechat) Mp() (mp *MpMgr, err error) {
+	err = wc.checkCfgBase()
+	if err != nil {
+		return
+	}
+	mp = new(MpMgr)
+	mp.Wechat = *wc
+	return
+}
+
+//checkCfgBase 检查配置基本信息
+func (wc *Wechat) checkCfgBase() (err error) {
+	return
+}
+
+func (wc *Wechat) checkCfgMch() (err error) {
+	err = wc.checkCfgBase()
+	if err != nil {
+		return
+	}
+	if wc.Context.MchID == "" || wc.Context.MchAPIKey == "" {
+		return fmt.Errorf("%s", "配置中没有MchID或者MchAPIKey")
+	}
+	return
 }
