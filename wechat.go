@@ -7,23 +7,23 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/wxcontext"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 // Wechat struct
 type Wechat struct {
-	Context *context.Context
+	Context *wxcontext.Context
 }
 
 // NewWechat init
-func NewWechat(cfg context.Config) *Wechat {
-	context := new(context.Context)
+func NewWechat(cfg wxcontext.Config) *Wechat {
+	context := new(wxcontext.Context)
 	initContext(cfg, context)
 	return &Wechat{context}
 }
 
-func initContext(cfg context.Config, context *context.Context) {
+func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
 	if cfg.Cache == nil {
 		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
 	}

@@ -11,7 +11,7 @@ type Pay struct {
 }
 
 //NewPay 实例化
-func NewPay(context *context.Context) *Pay {
+func NewPay(context *wxcontext.Context) *Pay {
 	pay := new(Pay)
 	pay.Context = context
 	return pay

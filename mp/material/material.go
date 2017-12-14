@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/yaotian/gowechat/wxcontext"
 	"github.com/yaotian/gowechat/util"
+	"github.com/yaotian/gowechat/wxcontext"
 )
 
 const (
@@ -17,11 +17,11 @@ const (
 
 //Material 素材管理
 type Material struct {
-	*context.Context
+	*wxcontext.Context
 }
 
 //NewMaterial init
-func NewMaterial(context *context.Context) *Material {
+func NewMaterial(context *wxcontext.Context) *Material {
 	material := new(Material)
 	material.Context = context
 	return material
