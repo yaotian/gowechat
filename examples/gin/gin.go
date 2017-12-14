@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yaotian/gowechat"
+	gcontext "github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/mp/message"
 )
 
@@ -18,7 +19,7 @@ func main() {
 func hello(c *gin.Context) {
 
 	//配置微信参数
-	config := &gowechat.Config{
+	config := gcontext.Config{
 		AppID:          "your app id",
 		AppSecret:      "your app secret",
 		Token:          "your token",
@@ -26,8 +27,13 @@ func hello(c *gin.Context) {
 	}
 	wc := gowechat.NewWechat(config)
 
+	mp, err := wc.Mp()
+	if err != nil {
+		return
+	}
+
 	// 传入request和responseWriter
-	server := wc.GetServer(c.Request, c.Writer)
+	server := mp.GetMsgServer(c.Request, c.Writer)
 	//设置接收消息的处理方法
 	server.SetMessageHandler(func(msg message.MixMessage) *message.Reply {
 
@@ -37,7 +43,7 @@ func hello(c *gin.Context) {
 	})
 
 	//处理消息接收以及回复
-	err := server.Serve()
+	err = server.Serve()
 	if err != nil {
 		fmt.Println(err)
 		return

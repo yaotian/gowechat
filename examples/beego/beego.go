@@ -20,14 +20,13 @@ func hello(ctx *context.Context) {
 	}
 	wc := gowechat.NewWechat(config)
 
-	// 传入request和responseWriter
-	var mp *gowechat.MpMgr
-	var err error
-	mp, err = wc.Mp()
+	mp, err := wc.Mp()
 	if err != nil {
 		return
 	}
-	server := mp.GetServer(ctx.Request, ctx.ResponseWriter)
+
+	// 传入request和responseWriter
+	server := mp.GetMsgServer(ctx.Request, ctx.ResponseWriter)
 	//设置接收消息的处理方法
 	server.SetMessageHandler(func(msg message.MixMessage) *message.Reply {
 
