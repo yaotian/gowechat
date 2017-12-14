@@ -6,8 +6,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/yaotian/gowechat"
+	gcontext "github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/mp/message"
-	gcontext "github.com/yaotian/gowechat/server/context"
 )
 
 func hello(ctx *context.Context) {
@@ -21,7 +21,13 @@ func hello(ctx *context.Context) {
 	wc := gowechat.NewWechat(config)
 
 	// 传入request和responseWriter
-	server := wc.GetServer(ctx.Request, ctx.ResponseWriter)
+	var mp *gowechat.MpMgr
+	var err error
+	mp, err = wc.Mp()
+	if err != nil {
+		return
+	}
+	server := mp.GetServer(ctx.Request, ctx.ResponseWriter)
 	//设置接收消息的处理方法
 	server.SetMessageHandler(func(msg message.MixMessage) *message.Reply {
 
@@ -31,7 +37,7 @@ func hello(ctx *context.Context) {
 	})
 
 	//处理消息接收以及回复
-	err := server.Serve()
+	err = server.Serve()
 	if err != nil {
 		fmt.Println(err)
 		return

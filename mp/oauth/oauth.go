@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/yaotian/gowechat/server/context"
+	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
 )
 

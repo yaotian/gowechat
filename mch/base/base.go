@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/yaotian/gowechat/server/context"
+	"github.com/yaotian/gowechat/context"
 )
 
 //MchBase base mch

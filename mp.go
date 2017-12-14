@@ -3,10 +3,13 @@
 package gowechat
 
 import (
+	"net/http"
+
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
 	"github.com/yaotian/gowechat/mp/menu"
 	"github.com/yaotian/gowechat/mp/oauth"
+	"github.com/yaotian/gowechat/mp/server"
 	"github.com/yaotian/gowechat/mp/template"
 	"github.com/yaotian/gowechat/mp/user"
 )
@@ -49,4 +52,11 @@ func (c *MpMgr) GetUser() *user.User {
 // GetTemplate 模板消息接口
 func (c *MpMgr) GetTemplate() *template.Template {
 	return template.NewTemplate(c.Context)
+}
+
+// GetServer 消息管理
+func (c *MpMgr) GetServer(req *http.Request, writer http.ResponseWriter) *server.Server {
+	c.Context.Request = req
+	c.Context.Writer = writer
+	return server.NewServer(c.Context)
 }

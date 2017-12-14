@@ -2,7 +2,7 @@ package pay
 
 import (
 	"github.com/yaotian/gowechat/mch/base"
-	"github.com/yaotian/gowechat/server/context"
+	"github.com/yaotian/gowechat/context"
 )
 
 //Pay pay

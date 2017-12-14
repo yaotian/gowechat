@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/yaotian/gowechat/server/context"
+	"github.com/yaotian/gowechat/context"
 	"github.com/yaotian/gowechat/util"
 )
 
