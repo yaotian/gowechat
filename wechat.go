@@ -1,5 +1,5 @@
-//GoWechat
-//
+/* package gowechat 一个简单易用的wechat封装.
+ */
 package gowechat
 
 import (
