@@ -15,13 +15,11 @@ import (
 	"github.com/yaotian/gowechat/wxcontext"
 )
 
-//Server struct
-type Server struct {
+//MsgHandler struct
+type MsgHandler struct {
 	*wxcontext.Context
 
-	openID string
-
-	messageHandler func(message.MixMessage) *message.Reply
+	handleMessageFunc func(message.MixMessage) *message.Reply
 
 	requestRawXMLMsg  []byte
 	requestMsg        message.MixMessage
@@ -34,15 +32,17 @@ type Server struct {
 	timestamp  int64
 }
 
-//NewServer init
-func NewServer(context *wxcontext.Context) *Server {
-	srv := new(Server)
+//NewMsgHandler init
+func NewMsgHandler(context *wxcontext.Context) *MsgHandler {
+	srv := new(MsgHandler)
 	srv.Context = context
 	return srv
 }
 
-//Serve 处理微信的请求消息
-func (srv *Server) Serve() error {
+//Handle 处理微信的请求消息
+func (srv *MsgHandler) Handle() error {
+	//Request is GET
+	//微信公众平台，设置服务器后保存，会调用此方法来做验证
 	if strings.ToLower(srv.Context.Request.Method) == "get" {
 		if !srv.Validate() {
 			return fmt.Errorf("请求校验失败")
@@ -50,11 +50,13 @@ func (srv *Server) Serve() error {
 
 		echostr, exists := srv.GetQuery("echostr")
 		if exists {
-			srv.String(echostr)
+			srv.String(echostr) //微信公众平台需要将此值发送回去，来完成验证
 		}
 		return nil
 	}
 
+	//Request is POST
+	//微信公众平台将消息post到服务器上
 	if strings.ToLower(srv.Context.Request.Method) == "post" {
 		replyMsg, err := srv.handleRequest()
 		if err != nil {
@@ -62,13 +64,16 @@ func (srv *Server) Serve() error {
 		}
 		//debug
 		//fmt.Println("request msg = ", string(srv.requestRawXMLMsg))
-		return srv.buildResponse(replyMsg)
+		err = srv.buildResponse(replyMsg)
+		if err == nil {
+			srv.Send()
+		}
 	}
 	return nil
 }
 
 //Validate 校验请求是否合法
-func (srv *Server) Validate() bool {
+func (srv *MsgHandler) Validate() bool {
 	timestamp := srv.Query("timestamp")
 	nonce := srv.Query("nonce")
 	signature := srv.Query("signature")
@@ -76,16 +81,13 @@ func (srv *Server) Validate() bool {
 }
 
 //HandleRequest 处理微信的请求
-func (srv *Server) handleRequest() (reply *message.Reply, err error) {
+func (srv *MsgHandler) handleRequest() (reply *message.Reply, err error) {
 	//set isSafeMode
 	srv.isSafeMode = false
 	encryptType := srv.Query("encrypt_type")
 	if encryptType == "aes" {
 		srv.isSafeMode = true
 	}
-
-	//set openID
-	srv.openID = srv.Query("openid")
 
 	var msg interface{}
 	msg, err = srv.getMessage()
@@ -97,17 +99,12 @@ func (srv *Server) handleRequest() (reply *message.Reply, err error) {
 		err = errors.New("消息类型转换失败")
 	}
 	srv.requestMsg = mixMessage
-	reply = srv.messageHandler(mixMessage)
+	reply = srv.handleMessageFunc(mixMessage)
 	return
 }
 
-//GetOpenID return openID
-func (srv *Server) GetOpenID() string {
-	return srv.openID
-}
-
 //getMessage 解析微信返回的消息
-func (srv *Server) getMessage() (interface{}, error) {
+func (srv *MsgHandler) getMessage() (interface{}, error) {
 	var rawXMLMsgBytes []byte
 	var err error
 	if srv.isSafeMode {
@@ -147,18 +144,18 @@ func (srv *Server) getMessage() (interface{}, error) {
 	return srv.parseRequestMessage(rawXMLMsgBytes)
 }
 
-func (srv *Server) parseRequestMessage(rawXMLMsgBytes []byte) (msg message.MixMessage, err error) {
+func (srv *MsgHandler) parseRequestMessage(rawXMLMsgBytes []byte) (msg message.MixMessage, err error) {
 	msg = message.MixMessage{}
 	err = xml.Unmarshal(rawXMLMsgBytes, &msg)
 	return
 }
 
-//SetMessageHandler 设置用户自定义的回调方法
-func (srv *Server) SetMessageHandler(handler func(message.MixMessage) *message.Reply) {
-	srv.messageHandler = handler
+//SetHandleMessageFunc 设置用户自定义的回调方法
+func (srv *MsgHandler) SetHandleMessageFunc(handler func(message.MixMessage) *message.Reply) {
+	srv.handleMessageFunc = handler
 }
 
-func (srv *Server) buildResponse(reply *message.Reply) (err error) {
+func (srv *MsgHandler) buildResponse(reply *message.Reply) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("panic error: %v\n%s", e, debug.Stack())
@@ -209,7 +206,7 @@ func (srv *Server) buildResponse(reply *message.Reply) (err error) {
 }
 
 //Send 将自定义的消息发送
-func (srv *Server) Send() (err error) {
+func (srv *MsgHandler) Send() (err error) {
 	replyMsg := srv.responseMsg
 	if srv.isSafeMode {
 		//安全模式下对消息进行加密

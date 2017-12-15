@@ -54,9 +54,9 @@ func (c *MpMgr) GetTemplate() *template.Template {
 	return template.NewTemplate(c.Context)
 }
 
-// GetMsgServer 消息管理
-func (c *MpMgr) GetMsgServer(req *http.Request, writer http.ResponseWriter) *bridge.Server {
+// GetMsgHandler 消息管理
+func (c *MpMgr) GetMsgHandler(req *http.Request, writer http.ResponseWriter) *bridge.MsgHandler {
 	c.Context.Request = req
 	c.Context.Writer = writer
-	return bridge.NewServer(c.Context)
+	return bridge.NewMsgHandler(c.Context)
 }
