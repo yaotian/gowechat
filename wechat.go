@@ -48,6 +48,10 @@ func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
 
 //Mch 商户平台
 func (wc *Wechat) Mch() (mch *MchMgr, err error) {
+	err = wc.checkCfgMch()
+	if err != nil {
+		return
+	}
 	mch = new(MchMgr)
 	mch.Wechat = *wc
 	return
