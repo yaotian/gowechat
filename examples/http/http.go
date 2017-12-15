@@ -20,7 +20,7 @@ func hello(rw http.ResponseWriter, req *http.Request) {
 	}
 	wc := gowechat.NewWechat(config)
 
-	mp, err := wc.Mp()
+	mp, err := wc.MpMgr()
 	if err != nil {
 		return
 	}

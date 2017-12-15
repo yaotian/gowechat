@@ -27,7 +27,7 @@ func hello(c *gin.Context) {
 	}
 	wc := gowechat.NewWechat(config)
 
-	mp, err := wc.Mp()
+	mp, err := wc.MpMgr()
 	if err != nil {
 		return
 	}

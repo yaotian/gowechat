@@ -47,7 +47,7 @@ func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
 }
 
 //Mch 商户平台
-func (wc *Wechat) Mch() (mch *MchMgr, err error) {
+func (wc *Wechat) MchMgr() (mch *MchMgr, err error) {
 	err = wc.checkCfgMch()
 	if err != nil {
 		return
@@ -58,7 +58,7 @@ func (wc *Wechat) Mch() (mch *MchMgr, err error) {
 }
 
 //Mp 公众平台
-func (wc *Wechat) Mp() (mp *MpMgr, err error) {
+func (wc *Wechat) MpMgr() (mp *MpMgr, err error) {
 	err = wc.checkCfgBase()
 	if err != nil {
 		return
