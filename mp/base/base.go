@@ -55,3 +55,37 @@ Do:
 	}
 	return
 }
+
+//HTTPPostJSONWithAccessToken post json 自动加上access token, 并retry
+func (c *MpBase) HTTPPostJSONWithAccessToken(url string, obj interface{}) (resp []byte, err error) {
+	retry := 1
+Do:
+	var accessToken string
+	accessToken, err = c.GetAccessToken()
+	if err != nil {
+		return
+	}
+
+	var target = ""
+	if strings.Contains(url, "?") {
+		target = fmt.Sprintf("%s&access_token=%s", url, accessToken)
+	} else {
+		target = fmt.Sprintf("%s?access_token=%s", url, accessToken)
+	}
+
+	resp, err = util.PostJSON(target, obj)
+
+	err = util.CheckCommonError(resp)
+	if err == util.ErrUnmarshall {
+		return
+	}
+	if err != nil {
+		if retry > 0 {
+			retry--
+			c.CleanAccessTokenCache()
+			goto Do
+		}
+		return
+	}
+	return
+}

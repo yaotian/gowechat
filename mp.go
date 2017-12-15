@@ -5,6 +5,7 @@ package gowechat
 import (
 	"net/http"
 
+	"github.com/yaotian/gowechat/mp/account"
 	"github.com/yaotian/gowechat/mp/bridge"
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
@@ -59,4 +60,9 @@ func (c *MpMgr) GetMsgHandler(req *http.Request, writer http.ResponseWriter) *br
 	c.Context.Request = req
 	c.Context.Writer = writer
 	return bridge.NewMsgHandler(c.Context)
+}
+
+// GetQrcode 带参数的二维码
+func (c *MpMgr) GetQrcode() *account.Qrcode {
+	return account.NewQrcode(c.Context)
 }

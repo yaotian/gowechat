@@ -2,7 +2,6 @@ package menu
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/yaotian/gowechat/mp/base"
 	"github.com/yaotian/gowechat/util"
@@ -121,27 +120,12 @@ func NewMenu(context *wxcontext.Context) *Menu {
 
 //SetMenu 设置按钮
 func (menu *Menu) SetMenu(buttons []*Button) error {
-	accessToken, err := menu.GetAccessToken()
-	if err != nil {
-		return err
-	}
-
-	uri := fmt.Sprintf("%s?access_token=%s", menuCreateURL, accessToken)
 	reqMenu := &reqMenu{
 		Button: buttons,
 	}
-
-	response, err := util.PostJSON(uri, reqMenu)
+	_, err := menu.HTTPPostJSONWithAccessToken(menuCreateURL, reqMenu)
 	if err != nil {
 		return err
-	}
-	var commError util.CommonError
-	err = json.Unmarshal(response, &commError)
-	if err != nil {
-		return err
-	}
-	if commError.ErrCode != 0 {
-		return fmt.Errorf("SetMenu Error , errcode=%d , errmsg=%s", commError.ErrCode, commError.ErrMsg)
 	}
 	return nil
 }
@@ -165,80 +149,40 @@ func (menu *Menu) DeleteMenu() (err error) {
 
 //AddConditional 添加个性化菜单
 func (menu *Menu) AddConditional(buttons []*Button, matchRule *MatchRule) error {
-	accessToken, err := menu.GetAccessToken()
-	if err != nil {
-		return err
-	}
-
-	uri := fmt.Sprintf("%s?access_token=%s", menuAddConditionalURL, accessToken)
 	reqMenu := &reqMenu{
 		Button:    buttons,
 		MatchRule: matchRule,
 	}
-
-	response, err := util.PostJSON(uri, reqMenu)
+	_, err := menu.HTTPPostJSONWithAccessToken(menuAddConditionalURL, reqMenu)
 	if err != nil {
 		return err
-	}
-	var commError util.CommonError
-	err = json.Unmarshal(response, &commError)
-	if err != nil {
-		return err
-	}
-	if commError.ErrCode != 0 {
-		return fmt.Errorf("AddConditional Error , errcode=%d , errmsg=%s", commError.ErrCode, commError.ErrMsg)
 	}
 	return nil
 }
 
 //DeleteConditional 删除个性化菜单
 func (menu *Menu) DeleteConditional(menuID int64) error {
-	accessToken, err := menu.GetAccessToken()
-	if err != nil {
-		return err
-	}
-
-	uri := fmt.Sprintf("%s?access_token=%s", menuDeleteConditionalURL, accessToken)
 	reqDeleteConditional := &reqDeleteConditional{
 		MenuID: menuID,
 	}
-
-	response, err := util.PostJSON(uri, reqDeleteConditional)
+	_, err := menu.HTTPPostJSONWithAccessToken(menuDeleteConditionalURL, reqDeleteConditional)
 	if err != nil {
 		return err
-	}
-	var commError util.CommonError
-	err = json.Unmarshal(response, &commError)
-	if err != nil {
-		return err
-	}
-	if commError.ErrCode != 0 {
-		return fmt.Errorf("DeleteConditional Error , errcode=%d , errmsg=%s", commError.ErrCode, commError.ErrMsg)
 	}
 	return nil
 }
 
 //MenuTryMatch 菜单匹配
 func (menu *Menu) MenuTryMatch(userID string) (buttons []Button, err error) {
-	var accessToken string
-	accessToken, err = menu.GetAccessToken()
-	if err != nil {
-		return
-	}
-	uri := fmt.Sprintf("%s?access_token=%s", menuTryMatchURL, accessToken)
 	reqMenuTryMatch := &reqMenuTryMatch{userID}
 	var response []byte
-	response, err = util.PostJSON(uri, reqMenuTryMatch)
+	response, err = menu.HTTPPostJSONWithAccessToken(menuTryMatchURL, reqMenuTryMatch)
 	if err != nil {
 		return
 	}
 	var resMenuTryMatch resMenuTryMatch
 	err = json.Unmarshal(response, &resMenuTryMatch)
 	if err != nil {
-		return
-	}
-	if resMenuTryMatch.ErrCode != 0 {
-		err = fmt.Errorf("MenuTryMatch Error , errcode=%d , errmsg=%s", resMenuTryMatch.ErrCode, resMenuTryMatch.ErrMsg)
 		return
 	}
 	buttons = resMenuTryMatch.Button

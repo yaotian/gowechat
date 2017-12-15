@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/yaotian/gowechat/mp/base"
 	"github.com/yaotian/gowechat/util"
 	"github.com/yaotian/gowechat/wxcontext"
 )
@@ -17,7 +18,7 @@ const (
 
 //Material 素材管理
 type Material struct {
-	*wxcontext.Context
+	base.MpBase
 }
 
 //NewMaterial init
@@ -54,14 +55,11 @@ type resArticles struct {
 func (material *Material) AddNews(articles []*Article) (mediaID string, err error) {
 	req := &reqArticles{articles}
 
-	var accessToken string
-	accessToken, err = material.GetAccessToken()
+	responseBytes, err := material.HTTPPostJSONWithAccessToken(addNewsURL, req)
 	if err != nil {
 		return
 	}
 
-	uri := fmt.Sprintf("%s?access_token=%s", addNewsURL, accessToken)
-	responseBytes, err := util.PostJSON(uri, req)
 	var res resArticles
 	err = json.Unmarshal(responseBytes, res)
 	if err != nil {
@@ -174,23 +172,9 @@ type reqDeleteMaterial struct {
 
 //DeleteMaterial 删除永久素材
 func (material *Material) DeleteMaterial(mediaID string) error {
-	accessToken, err := material.GetAccessToken()
+	_, err := material.HTTPPostJSONWithAccessToken(delMaterialURL, reqDeleteMaterial{mediaID})
 	if err != nil {
 		return err
-	}
-
-	uri := fmt.Sprintf("%s?access_token=%s", delMaterialURL, accessToken)
-	response, err := util.PostJSON(uri, reqDeleteMaterial{mediaID})
-	if err != nil {
-		return err
-	}
-	var resDeleteMaterial util.CommonError
-	err = json.Unmarshal(response, &resDeleteMaterial)
-	if err != nil {
-		return err
-	}
-	if resDeleteMaterial.ErrCode != 0 {
-		return fmt.Errorf("DeleteMaterial error : errcode=%v , errmsg=%v", resDeleteMaterial.ErrCode, resDeleteMaterial.ErrMsg)
 	}
 	return nil
 }

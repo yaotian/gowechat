@@ -29,7 +29,7 @@ func HTTPGet(uri string) ([]byte, error) {
 }
 
 //PostJSON post json 数据请求
-func PostJSON(uri string, obj interface{}) ([]byte, error) {
+func PostJSON(url string, obj interface{}) ([]byte, error) {
 	jsonData, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
@@ -40,14 +40,14 @@ func PostJSON(uri string, obj interface{}) ([]byte, error) {
 	jsonData = bytes.Replace(jsonData, []byte("\\u0026"), []byte("&"), -1)
 
 	body := bytes.NewBuffer(jsonData)
-	response, err := http.Post(uri, "application/json;charset=utf-8", body)
+	response, err := http.Post(url, "application/json;charset=utf-8", body)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("http get error : uri=%v , statusCode=%v", uri, response.StatusCode)
+		return nil, fmt.Errorf("http get error : uri=%v , statusCode=%v", url, response.StatusCode)
 	}
 	return ioutil.ReadAll(response.Body)
 }
