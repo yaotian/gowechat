@@ -41,8 +41,6 @@ func hello(ctx *context.Context) {
 		fmt.Println(err)
 		return
 	}
-	//发送回复的消息
-	msgHandler.Send()
 }
 
 func main() {

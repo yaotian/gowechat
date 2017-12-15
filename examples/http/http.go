@@ -41,8 +41,6 @@ func hello(rw http.ResponseWriter, req *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	//发送回复的消息
-	msgHandler.Send()
 }
 
 func main() {
