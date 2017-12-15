@@ -1,6 +1,6 @@
 # GoWechat 微信平台API
-支持微信公众平台-订阅号，服务号,微信商家平台,微信开放平台,微信企业号;  
-与golang的各种框架(beego,gin,net/http)无缝链接
+支持微信公众平台-订阅号，服务号,微信商家平台,微信开放平台,微信企业号;  
+与golang的各种框架(beego,gin,net/http)无缝链接
 
 ## Quick Start
 
