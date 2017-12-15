@@ -1,5 +1,4 @@
-/* package gowechat 一个简单易用的wechat封装.
- */
+//Package gowechat 一个简单易用的wechat封装.
 package gowechat
 
 import (
@@ -46,7 +45,7 @@ func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
 	}
 }
 
-//Mch 商户平台
+//MchMgr 商户平台
 func (wc *Wechat) MchMgr() (mch *MchMgr, err error) {
 	err = wc.checkCfgMch()
 	if err != nil {
@@ -57,7 +56,7 @@ func (wc *Wechat) MchMgr() (mch *MchMgr, err error) {
 	return
 }
 
-//Mp 公众平台
+//MpMgr 公众平台
 func (wc *Wechat) MpMgr() (mp *MpMgr, err error) {
 	err = wc.checkCfgBase()
 	if err != nil {

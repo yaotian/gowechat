@@ -3,13 +3,17 @@ package base
 import "fmt"
 
 const (
+	//ReturnCodeSuccess success
 	ReturnCodeSuccess = "SUCCESS"
-	ReturnCodeFail    = "FAIL"
+	//ReturnCodeFail fail
+	ReturnCodeFail = "FAIL"
 )
 
 const (
+	//ResultCodeSuccess success
 	ResultCodeSuccess = "SUCCESS"
-	ResultCodeFail    = "FAIL"
+	//ResultCodeFail fail
+	ResultCodeFail = "FAIL"
 )
 
 //Error error

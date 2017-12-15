@@ -48,7 +48,7 @@ func FormatMapToXML(xmlWriter io.Writer, m map[string]string) (err error) {
 	return
 }
 
-// 微信支付签名.
+//Sign 微信支付签名.
 //  parameters: 待签名的参数集合
 //  apiKey:     API密钥
 //  fn:         func() hash.Hash, 如果 fn == nil 则默认用 md5.New

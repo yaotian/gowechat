@@ -6,7 +6,8 @@ import (
 	"fmt"
 )
 
-var ErrUnmarshall error = errors.New("Json Unmarshal Error")
+//ErrUnmarshall err when unmarshall
+var ErrUnmarshall = errors.New("Json Unmarshal Error")
 
 //CommonError 微信返回的错误信息
 type CommonError struct {
@@ -14,6 +15,7 @@ type CommonError struct {
 	ErrMsg  string `json:"errmsg"`
 }
 
+//NewCommonError new CommonError
 func NewCommonError(code int64, msg string) *CommonError {
 	return &CommonError{ErrCode: code, ErrMsg: msg}
 }

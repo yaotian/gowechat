@@ -33,14 +33,14 @@ Do:
 		target = fmt.Sprintf("%s?access_token=%s", url, accessToken)
 	}
 
-	var reponse *http.Response
-	reponse, err = http.Get(target)
+	var response *http.Response
+	response, err = http.Get(target)
 	if err != nil {
 		return
 	}
-	defer reponse.Body.Close()
+	defer response.Body.Close()
 
-	resp, err = ioutil.ReadAll(reponse.Body)
+	resp, err = ioutil.ReadAll(response.Body)
 	err = util.CheckCommonError(resp)
 	if err == util.ErrUnmarshall {
 		return
