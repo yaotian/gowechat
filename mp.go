@@ -5,11 +5,11 @@ package gowechat
 import (
 	"net/http"
 
+	"github.com/yaotian/gowechat/mp/bridge"
 	"github.com/yaotian/gowechat/mp/jssdk"
 	"github.com/yaotian/gowechat/mp/material"
 	"github.com/yaotian/gowechat/mp/menu"
 	"github.com/yaotian/gowechat/mp/oauth"
-	"github.com/yaotian/gowechat/mp/server"
 	"github.com/yaotian/gowechat/mp/template"
 	"github.com/yaotian/gowechat/mp/user"
 )
@@ -55,8 +55,8 @@ func (c *MpMgr) GetTemplate() *template.Template {
 }
 
 // GetMsgServer 消息管理
-func (c *MpMgr) GetMsgServer(req *http.Request, writer http.ResponseWriter) *server.Server {
+func (c *MpMgr) GetMsgServer(req *http.Request, writer http.ResponseWriter) *bridge.Server {
 	c.Context.Request = req
 	c.Context.Writer = writer
-	return server.NewServer(c.Context)
+	return bridge.NewServer(c.Context)
 }

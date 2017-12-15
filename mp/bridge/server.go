@@ -1,4 +1,4 @@
-package server
+package bridge
 
 import (
 	"encoding/xml"
