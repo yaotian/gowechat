@@ -1,4 +1,4 @@
-# GoWechat 微信平台API  [![GoDoc](http://godoc.org/github.com/yaotian/gowechat?status.svg)](http://godoc.org/github.com/yaotian/gowechat)  [![Go Report Card](https://goreportcard.com/badge/github.com/yaotian/gowechat)](https://goreportcard.com/report/github.com/yaotian/gowechat)
+# GoWechat 微信平台API [![Build Status](https://travis-ci.org/yaotian/gowechat.svg?branch=master)](https://travis-ci.org/yaotian/gowechat)  [![GoDoc](http://godoc.org/github.com/yaotian/gowechat?status.svg)](http://godoc.org/github.com/yaotian/gowechat)  [![Go Report Card](https://goreportcard.com/badge/github.com/yaotian/gowechat)](https://goreportcard.com/report/github.com/yaotian/gowechat)
 
 支持微信公众平台(订阅号，服务号),微信商家平台,微信开放平台,微信企业号;  
 与golang的各种框架(beego,gin,net/http)无缝链接
