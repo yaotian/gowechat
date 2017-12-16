@@ -22,7 +22,7 @@ type PageOAuthHandler struct {
 	checkOpenIDExistingFunc func(openID string) bool
 
 	oauth.UserInfo
-	afterGetUserInfoFunc func(user oauth.UserInfo)
+	afterGetUserInfoFunc func(user oauth.UserInfo) bool
 }
 
 //NewPageOAuthHandler PageOAuthHandler初始化
@@ -37,13 +37,36 @@ func (c *PageOAuthHandler) getCallbackURL() (u string) {
 	return fmt.Sprintf("%s?target=%s", c.oAuthCallbackURL, url.QueryEscape(c.urlNeedOAuth))
 }
 
-//SetFuncCheckOpenIDExisting 设置检查OpenID在您的系统中是否已经存在
+/*SetFuncCheckOpenIDExisting 设置检查OpenID在您的系统中是否已经存在
+
+handler:
+
+	func(openID string) (existing bool){
+		//用获得的openID，检查是否在你的系统中已经存在此用户
+		//如果存在，调用你的Login方法，设置cookie, session等，然后return true
+
+		//如果你的系统中不存在此openID用户, return false, handler会自动去获取用户信息
+	}
+
+*/
 func (c *PageOAuthHandler) SetFuncCheckOpenIDExisting(handler func(string) bool) {
 	c.checkOpenIDExistingFunc = handler
 }
 
-//SetFuncAfterGetUserInfo 设置获得用户信息后执行
-func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(oauth.UserInfo)) {
+/*SetFuncAfterGetUserInfo 设置获得用户信息后执行
+
+handler:
+
+	func(user oauth.UserInfo) (needStop bool) {
+		//handler已经获得了用户信息，你可以用此信息，自动为用户完成一些动作，比如注册，头像等
+
+		//默认needStop为false, 表示handler会自动redirect到你最开始需要授权的网页，此时你的系统已经完成了自动登陆等动作
+		//如果你需要redirect到你需要的url，直接调用http.redirect； return true。 表示需要停止后面的动作
+	}
+
+
+*/
+func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(oauth.UserInfo) bool) {
 	c.afterGetUserInfoFunc = handler
 }
 
@@ -69,8 +92,9 @@ func (c *PageOAuthHandler) Handle() (err error) {
 		}
 		c.UserInfo, err = c.GetUserInfo(acsTkn.AccessToken, openID)
 		if err == nil {
-			c.afterGetUserInfoFunc(c.UserInfo)
-			http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
+			if !c.afterGetUserInfoFunc(c.UserInfo) {
+				http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
+			}
 			return
 		}
 	}
