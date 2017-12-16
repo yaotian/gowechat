@@ -31,18 +31,15 @@ func NewOauth(context *wxcontext.Context) *Oauth {
 }
 
 //GetRedirectURL 获取跳转的url地址
-func (oauth *Oauth) GetRedirectURL(redirectURI, scope, state string) (string, error) {
+func (oauth *Oauth) GetRedirectURL(redirectURI, scope, state string) string {
 	//url encode
 	urlStr := url.QueryEscape(redirectURI)
-	return fmt.Sprintf(redirectOauthURL, oauth.AppID, urlStr, scope, state), nil
+	return fmt.Sprintf(redirectOauthURL, oauth.AppID, urlStr, scope, state)
 }
 
 //Redirect 跳转到网页授权
 func (oauth *Oauth) Redirect(writer http.ResponseWriter, redirectURI, scope, state string) error {
-	location, err := oauth.GetRedirectURL(redirectURI, scope, state)
-	if err != nil {
-		return err
-	}
+	location := oauth.GetRedirectURL(redirectURI, scope, state)
 	//location 为完整地址，所以不需要request
 	http.Redirect(writer, nil, location, 302)
 	return nil
