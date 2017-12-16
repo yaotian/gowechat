@@ -62,6 +62,14 @@ func (c *MpMgr) GetMsgHandler(req *http.Request, writer http.ResponseWriter) *br
 	return bridge.NewMsgHandler(c.Context)
 }
 
+//GetPageOAuthHandler 网页授权
+func (c *MpMgr) GetPageOAuthHandler(req *http.Request, writer http.ResponseWriter, oAuthCallbackURL string) *bridge.PageOAuthHandler {
+	c.Context.Request = req
+	c.Context.Writer = writer
+	handler := bridge.NewPageOAuthHandler(c.Context, oAuthCallbackURL)
+	return handler
+}
+
 // GetQrcode 带参数的二维码
 func (c *MpMgr) GetQrcode() *account.Qrcode {
 	return account.NewQrcode(c.Context)

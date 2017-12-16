@@ -35,6 +35,7 @@ type MsgHandler struct {
 //NewMsgHandler init
 func NewMsgHandler(context *wxcontext.Context) *MsgHandler {
 	srv := new(MsgHandler)
+	fmt.Println("NewMsgHandler:", srv)
 	srv.Context = context
 	return srv
 }
