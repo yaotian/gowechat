@@ -17,6 +17,7 @@ type PageOAuthHandler struct {
 	oAuthCallbackURL string
 	urlNeedOAuth     string
 
+	openID                  string
 	openIDExisting          bool
 	checkOpenIDExistingFunc func(openID string) bool
 
@@ -34,6 +35,16 @@ func NewPageOAuthHandler(context *wxcontext.Context, oAuthCallbackURL string) *P
 
 func (c *PageOAuthHandler) getCallbackURL() (u string) {
 	return fmt.Sprintf("%s?target=%s", c.oAuthCallbackURL, url.QueryEscape(c.urlNeedOAuth))
+}
+
+//SetFuncCheckOpenIDExisting 设置检查OpenID在您的系统中是否已经存在
+func (c *PageOAuthHandler) SetFuncCheckOpenIDExisting(handler func(string) bool) {
+	c.checkOpenIDExistingFunc = handler
+}
+
+//SetFuncAfterGetUserInfo 设置获得用户信息后执行
+func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(oauth.UserInfo)) {
+	c.afterGetUserInfoFunc = handler
 }
 
 //Handle handler
