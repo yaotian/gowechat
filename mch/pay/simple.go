@@ -1,20 +1,16 @@
 package pay
 
 import (
-	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
-	"hash"
-	"sort"
 	"time"
 	"unicode/utf8"
 
+	"github.com/yaotian/gowechat/mch/base"
 	"github.com/yaotian/gowechat/util"
 )
 
 //Order 下单
-//https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
+//官网文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
 type Order struct {
 	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
 	Body        string //String(128)
@@ -26,8 +22,9 @@ type Order struct {
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
 }
 
-//GetPrepayMap 支付页面需要的信息，map格式
-func (c *Pay) GetPrepayMap(order Order) (result map[string]string, err error) {
+/*GetJsAPIRequestDataMap 前端JsAPI支付时,需要提交的信息
+ */
+func (c *Pay) GetJsAPIRequestDataMap(order Order) (result map[string]string, err error) {
 	err = c.checkOrder(order)
 	if err != nil {
 		return
@@ -48,7 +45,7 @@ func (c *Pay) GetPrepayMap(order Order) (result map[string]string, err error) {
 	result["package"] = "prepay_id=" + prepayID
 	result["signType"] = "MD5"
 
-	sign := sign(result, c.MchAPIKey, nil)
+	sign := base.Sign(result, c.MchAPIKey, nil)
 	result["paySign"] = sign
 	return
 }
@@ -89,52 +86,9 @@ func (c *Pay) createUnifiedOrderMap(order Order) (input map[string]string) {
 	input["openid"] = order.OpenID //设置trade_type=JSAPI，此参数必传，用户在商户appid下的唯一标识。下单前需要调用【网页授权获取用户信息】接口获取到用户的Openid
 
 	//sign
-	sign := sign(input, c.MchAPIKey, nil)
+	sign := base.Sign(input, c.MchAPIKey, nil)
 	input["sign"] = sign
 	return
-}
-
-// 微信支付签名.
-//  parameters: 待签名的参数集合
-//  apiKey:     API密钥
-//  fn:         func() hash.Hash, 如果 fn == nil 则默认用 md5.New
-func sign(parameters map[string]string, apiKey string, fn func() hash.Hash) string {
-	ks := make([]string, 0, len(parameters))
-	for k := range parameters {
-		if k == "sign" {
-			continue
-		}
-		ks = append(ks, k)
-	}
-	sort.Strings(ks)
-
-	if fn == nil {
-		fn = md5.New
-	}
-	h := fn()
-
-	buf := make([]byte, 256)
-	for _, k := range ks {
-		v := parameters[k]
-		if v == "" {
-			continue
-		}
-
-		buf = buf[:0]
-		buf = append(buf, k...)
-		buf = append(buf, '=')
-		buf = append(buf, v...)
-		buf = append(buf, '&')
-		h.Write(buf)
-	}
-	buf = buf[:0]
-	buf = append(buf, "key="...)
-	buf = append(buf, apiKey...)
-	h.Write(buf)
-
-	signature := make([]byte, h.Size()*2)
-	hex.Encode(signature, h.Sum(nil))
-	return string(bytes.ToUpper(signature))
 }
 
 func (c *Pay) checkOrder(order Order) (err error) {
