@@ -22,6 +22,7 @@ var config = wxcontext.Config{
 func hello(ctx *context.Context) {
 	//配置微信参数
 	wc := gowechat.NewWechat(config)
+	fmt.Println("wechat:", *wc)
 	//微信平台mp
 	mp, err := wc.MpMgr()
 	if err != nil {
@@ -64,9 +65,10 @@ func wxOAuth(ctx *context.Context) {
 		return true
 	})
 
-	oauthHandler.SetFuncAfterGetUserInfo(func(user oauth.UserInfo) {
+	oauthHandler.SetFuncAfterGetUserInfo(func(user oauth.UserInfo) bool {
 		//已获得用户信息，这里用信息做注册使用
 		//调用自己的Login方法，设置cookie等
+		return false
 	})
 
 	oauthHandler.Handle()
