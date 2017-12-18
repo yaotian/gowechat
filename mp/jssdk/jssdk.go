@@ -24,6 +24,15 @@ type Config struct {
 	Signature string `json:"signature"`
 }
 
+//JsString wx.config中的配置
+func (c *Config) JsString() (str string) {
+	return fmt.Sprintf(`
+		appId: "%s", 
+		timestamp: '%d', 
+		nonceStr: '%s', 
+		signature: '%s',`, c.AppID, c.Timestamp, c.NonceStr, c.Signature)
+}
+
 // resTicket 请求jsapi_tikcet返回结果
 type resTicket struct {
 	util.CommonError
@@ -41,7 +50,7 @@ func NewJs(context *wxcontext.Context) *Js {
 
 //GetConfig 获取jssdk需要的配置参数
 //uri 为当前网页地址
-func (js *Js) GetConfig(uri string) (config *Config, err error) {
+func (js *Js) GetConfig(url string) (config *Config, err error) {
 	config = new(Config)
 	var ticketStr string
 	ticketStr, err = js.GetTicket()
@@ -51,7 +60,7 @@ func (js *Js) GetConfig(uri string) (config *Config, err error) {
 
 	nonceStr := util.RandomStr(16)
 	timestamp := util.GetCurrTs()
-	str := fmt.Sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s", ticketStr, nonceStr, timestamp, uri)
+	str := fmt.Sprintf("jsapi_ticket=%s&noncestr=%s&timestamp=%d&url=%s", ticketStr, nonceStr, timestamp, url)
 	sigStr := util.Signature(str)
 
 	config.AppID = js.AppID
