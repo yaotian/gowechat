@@ -1,6 +1,7 @@
 package pay
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 	"unicode/utf8"
@@ -9,9 +10,9 @@ import (
 	"github.com/yaotian/gowechat/util"
 )
 
-//Order 下单
+//OrderInput 下单
 //官网文档 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
-type Order struct {
+type OrderInput struct {
 	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
 	Body        string //String(128)
 	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
@@ -22,9 +23,45 @@ type Order struct {
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
 }
 
-/*GetJsAPIRequestDataMap 前端JsAPI支付时,需要提交的信息
+//Config jssdk支付时需要的配置
+type WxPayConfig struct {
+	AppID     string `json:"appId"`
+	TimeStamp string `json:"timeStamp"`
+	NonceStr  string `json:"nonceStr"`
+	Package   string `json:"package"`
+	SignType  string `json:"signType"`
+	PaySign   string `json:"paySign"`
+	resultMap map[string]string
+}
+
+//ToString wx.chooseWXPay content
+func (c *WxPayConfig) ToString() (str string) {
+	return fmt.Sprintf(`
+		timestamp: %s,
+    nonceStr: '%s',
+    package: '%s',
+    signType: '%s',
+    paySign: '%s', 
+		`, c.TimeStamp, c.NonceStr, c.Package, c.SignType, c.PaySign)
+}
+
+//ToJSON WeixinJSBridge  json content
+func (c *WxPayConfig) ToJSON() (str string) {
+	js, err := json.Marshal(c)
+	if err == nil {
+		return string(js)
+	}
+	return
+}
+
+//ToMap result map[string]string
+func (c *WxPayConfig) ToMap() (m map[string]string) {
+	return c.resultMap
+}
+
+/*GetJsAPIConfig 前端JsAPI支付时,需要提交的信息
  */
-func (c *Pay) GetJsAPIRequestDataMap(order Order) (result map[string]string, err error) {
+func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayConfig, err error) {
 	err = c.checkOrder(order)
 	if err != nil {
 		return
@@ -38,7 +75,7 @@ func (c *Pay) GetJsAPIRequestDataMap(order Order) (result map[string]string, err
 	nocestr := util.RandomStr(8)
 	timestamp := fmt.Sprint(time.Now().Unix())
 
-	result = make(map[string]string)
+	result := make(map[string]string)
 	result["appId"] = c.AppID
 	result["timeStamp"] = timestamp
 	result["nonceStr"] = nocestr
@@ -47,11 +84,22 @@ func (c *Pay) GetJsAPIRequestDataMap(order Order) (result map[string]string, err
 
 	sign := base.Sign(result, c.MchAPIKey, nil)
 	result["paySign"] = sign
+
+	config = new(WxPayConfig)
+	config.NonceStr = util.RandomStr(8)
+	config.TimeStamp = fmt.Sprint(time.Now().Unix())
+	config.AppID = c.AppID
+	config.Package = "prepay_id=" + prepayID
+	config.SignType = "MD5"
+	config.PaySign = sign
+
+	config.resultMap = result
+
 	return
 }
 
 // 调用 UnifiedOrder 获得 prepayID
-func (c *Pay) getPrepayID(order Order) (prepayID string, err error) {
+func (c *Pay) getPrepayID(order OrderInput) (prepayID string, err error) {
 	input := c.createUnifiedOrderMap(order)
 	var result map[string]string
 	if result, err = c.UnifiedOrder(input); err == nil { //有prepay_id
@@ -64,7 +112,7 @@ func (c *Pay) getPrepayID(order Order) (prepayID string, err error) {
 	return
 }
 
-func (c *Pay) createUnifiedOrderMap(order Order) (input map[string]string) {
+func (c *Pay) createUnifiedOrderMap(order OrderInput) (input map[string]string) {
 	input = make(map[string]string)
 	input["appid"] = c.AppID               //设置微信分配的公众账号ID
 	input["mch_id"] = c.MchID              //设置微信支付分配的商户号
@@ -91,7 +139,7 @@ func (c *Pay) createUnifiedOrderMap(order Order) (input map[string]string) {
 	return
 }
 
-func (c *Pay) checkOrder(order Order) (err error) {
+func (c *Pay) checkOrder(order OrderInput) (err error) {
 	tradeType := order.TradeType
 	if tradeType != "JSAPI" && tradeType != "APP" && tradeType != "NATIVE" {
 		return fmt.Errorf("tradeType is invalid")
