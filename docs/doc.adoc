@@ -122,6 +122,39 @@ if err != nil {
 === 订单
 
 ==== 统一下单
+===== 下单前需要准备的信息
+[source,go]
+----
+type OrderInput struct {
+	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
+	Body        string //String(128)
+	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
+	TotalFee    int    //分为单位
+	IP          string
+	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
+	TradeType   string //JSAPI，NATIVE，APP
+	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+}
+----
+
+===== 获取前端支付所需要的配置信息
+[source,go]
+----
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+pay := mch.GetPay()
+
+config = OrderInput{
+  OpenID:"openID",
+  Body:"支付"
+}
+
+wxPayConfig, err := pay.GetJsAPIConfig(config)
+
+----
 
 ==== 查询订单
 
