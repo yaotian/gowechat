@@ -10,6 +10,11 @@ import (
 
 const (
 	templateSendURL = "https://api.weixin.qq.com/cgi-bin/message/template/send"
+
+	templateAddURL         = "https://api.weixin.qq.com/cgi-bin/template/api_add_template"
+	templateAllURL         = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template"
+	templateSetIndustryURL = "https://api.weixin.qq.com/cgi-bin/template/api_set_industry"
+	templateGetIndustryURL = "https://api.weixin.qq.com/cgi-bin/template/get_industry"
 )
 
 //Template 模板消息
@@ -63,5 +68,83 @@ func (tpl *Template) Send(msg *Message) (msgID int64, err error) {
 		return
 	}
 	msgID = result.MsgID
+	return
+}
+
+//IndustryList 行业列表
+type IndustryList struct {
+	PrimaryIndustry *Industry `json:"primary_industry"`
+	SecondIndustry  *Industry `json:"secondary_industry"`
+}
+
+//Industry 行业
+type Industry struct {
+	FirstClass  string `json:"first_class"`
+	SecondClass string `json:"second_class"`
+}
+
+//Tmpl 模板
+type Tmpl struct {
+	TemplateId      string `json:"template_id"`
+	Title           string `json:"title"`
+	PrimaryIndustry string `json:"primary_industry"`
+	DeputyIndustry  string `json:"deputy_industry"`
+}
+
+//TmplList 模板列表
+type TmplList struct {
+	Templates []*Tmpl `json:"template_list"`
+}
+
+//AddTemplate 增加一个模板
+func (tpl *Template) AddTemplate(templateIDShort string) (templateID string, err error) {
+	type reqAddTmpl struct {
+		TemplateIDShort string `json:"template_id_short"`
+	}
+	var response []byte
+	response, err = tpl.HTTPPostJSONWithAccessToken(templateAddURL, reqAddTmpl{TemplateIDShort: templateIDShort})
+	if err != nil {
+		return "", err
+	}
+
+	var result Tmpl
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		return
+	}
+	templateID = result.TemplateId
+	return
+}
+
+//GetTemplateList 查询模板列表
+func (tpl *Template) GetTemplateList(templateIDShort string) (list TmplList, err error) {
+	var response []byte
+	response, err = tpl.HTTPGetWithAccessToken(templateAllURL)
+	err = json.Unmarshal(response, &list)
+	return
+}
+
+//GetTemplateIndustry 获得模板行业
+func (tpl *Template) GetTemplateIndustry() (industryList IndustryList, err error) {
+	var response []byte
+	response, err = tpl.HTTPGetWithAccessToken(templateGetIndustryURL)
+	err = json.Unmarshal(response, &industryList)
+	return
+}
+
+//SetTemplateIndustry 设置模板行业
+func (tpl *Template) SetTemplateIndustry(industry1, industry2 int) (err error) {
+	type reqSetIndustry struct {
+		Industry1 int `json:"industry_id1"`
+		Industry2 int `json:"industry_id2"`
+	}
+	var req reqSetIndustry
+	if industry1 > 0 {
+		req.Industry1 = industry1
+	}
+	if industry2 > 0 {
+		req.Industry2 = industry2
+	}
+	_, err = tpl.HTTPPostJSONWithAccessToken(templateSetIndustryURL, req)
 	return
 }
