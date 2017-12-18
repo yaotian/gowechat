@@ -3,12 +3,71 @@
 
 [[install,安装]]
 == 安装
+  go get github.com/yaotian/gowechat
 
 [[use,使用]]
+== 配置
+
+==== 参数
+```go
+var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key", 
+
+	//以下是 mch商户平台需要的变量
+	SslCertFilePath string //证书公钥文件的路径
+	SslKeyFilePath  string //证书私钥文件的路径
+	SslCertContent  string //公钥证书的内容
+	SslKeyContent   string //私钥证书的内容
+	MchID           string //商户ID
+	MchAPIKey       string //商户平台设置的api key
+}
+
+```
+
+=== 微信平台的操作接口
+
+==== 微信公众平台
+
+```go
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+```
+
+==== 微信商户平台
+
+```go
+wc := gowechat.NewWechat(config)
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+
+```
+
 == 在框架中使用
 
+=== beego中使用的例子
+  ./examples/beego 
+
+=== gin中使用的例子
+  ./examples/gin
+
+=== net/http中使用的例子 
+  ./examples/http
+
 [[mp,mp]]
-== 公众号
+== 微信公众平台
+
+=== 初始化
 
 === 消息
 
@@ -26,6 +85,51 @@
 
 [[mch,mch]]
 == 微信支付(商户平台)
+=== 初始化
+```go
+var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key", 
+
+  //------以下是 mch商户平台需要的变量
+  //
+  //证书公钥，路径，内容要保证只要有一项设置
+	SslCertFilePath string //证书公钥文件的路径
+	SslCertContent  string //公钥证书的内容
+
+  //私钥，路径，内容要保证只要有一项设置
+	SslKeyFilePath  string //证书私钥文件的路径
+	SslKeyContent   string //私钥证书的内容
+
+	MchID           string //商户ID
+	MchAPIKey       string //商户平台设置的api key
+  //------ End 商户平台设置
+}
+
+wc := gowechat.NewWechat(config)
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+
+```
+
+=== 订单
+
+=== 退款
+
+=== 账单
+
+=== 通知
+
+
+
+
+=== JSSDK
 
 [[open,open]]
 == 开放平台

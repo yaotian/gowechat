@@ -432,9 +432,22 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#install">安装</a></li>
-<li><a href="#use">在框架中使用</a></li>
-<li><a href="#mp">公众号</a>
+<li><a href="#use">配置</a>
+<ul class="sectlevel3">
+<li><a href="#_参数">参数</a></li>
+<li><a href="#_微信平台的操作接口">微信平台的操作接口</a></li>
+</ul>
+</li>
+<li><a href="#_在框架中使用">在框架中使用</a>
 <ul class="sectlevel2">
+<li><a href="#_beego_中使用的例子">beego中使用的例子</a></li>
+<li><a href="#_gin中使用的例子">gin中使用的例子</a></li>
+<li><a href="#_net_http中使用的例子">net/http中使用的例子</a></li>
+</ul>
+</li>
+<li><a href="#mp">微信公众平台</a>
+<ul class="sectlevel2">
+<li><a href="#_初始化">初始化</a></li>
 <li><a href="#_消息">消息</a></li>
 <li><a href="#_模板消息">模板消息</a></li>
 <li><a href="#_用户">用户</a></li>
@@ -444,7 +457,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_菜单">菜单</a></li>
 </ul>
 </li>
-<li><a href="#mch">微信支付(商户平台)</a></li>
+<li><a href="#mch">微信支付(商户平台)</a>
+<ul class="sectlevel2">
+<li><a href="#_初始化_2">初始化</a></li>
+<li><a href="#_订单">订单</a></li>
+<li><a href="#_退款">退款</a></li>
+<li><a href="#_账单">账单</a></li>
+<li><a href="#_通知">通知</a></li>
+<li><a href="#_jssdk_2">JSSDK</a></li>
+</ul>
+</li>
 <li><a href="#open">开放平台</a></li>
 <li><a href="#corp">企业微信</a></li>
 <li><a href="#mini">小程序</a></li>
@@ -456,18 +478,105 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="install">安装</h2>
 <div class="sectionbody">
-
+<div class="literalblock">
+<div class="content">
+<pre>go get github.com/yaotian/gowechat</pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="use">在框架中使用</h2>
+<h2 id="use">配置</h2>
 <div class="sectionbody">
+<div class="sect3">
+<h4 id="_参数">参数</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key",
 
+	//以下是 mch商户平台需要的变量
+	SslCertFilePath string //证书公钥文件的路径
+	SslKeyFilePath  string //证书私钥文件的路径
+	SslCertContent  string //公钥证书的内容
+	SslKeyContent   string //私钥证书的内容
+	MchID           string //商户ID
+	MchAPIKey       string //商户平台设置的api key
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_微信平台的操作接口">微信平台的操作接口</h3>
+<div class="sect3">
+<h4 id="_微信公众平台">微信公众平台</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_微信商户平台">微信商户平台</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="mp">公众号</h2>
+<h2 id="_在框架中使用">在框架中使用</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_beego_中使用的例子">beego中使用的例子</h3>
+<div class="literalblock">
+<div class="content">
+<pre>./examples/beego</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_gin中使用的例子">gin中使用的例子</h3>
+<div class="literalblock">
+<div class="content">
+<pre>./examples/gin</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_net_http中使用的例子">net/http中使用的例子</h3>
+<div class="literalblock">
+<div class="content">
+<pre>./examples/http</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="mp">微信公众平台</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_初始化">初始化</h3>
+
+</div>
 <div class="sect2">
 <h3 id="_消息">消息</h3>
 
@@ -501,7 +610,61 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="mch">微信支付(商户平台)</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_初始化_2">初始化</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key",
 
+  //------以下是 mch商户平台需要的变量
+  //
+  //证书公钥，路径，内容要保证只要有一项设置
+	SslCertFilePath string //证书公钥文件的路径
+	SslCertContent  string //公钥证书的内容
+
+  //私钥，路径，内容要保证只要有一项设置
+	SslKeyFilePath  string //证书私钥文件的路径
+	SslKeyContent   string //私钥证书的内容
+
+	MchID           string //商户ID
+	MchAPIKey       string //商户平台设置的api key
+  //------ End 商户平台设置
+}
+
+wc := gowechat.NewWechat(config)
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_订单">订单</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_退款">退款</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_账单">账单</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_通知">通知</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_jssdk_2">JSSDK</h3>
+
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -531,7 +694,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-18 12:50:18 CST
+Last updated 2017-12-18 18:02:32 CST
 </div>
 </div>
 </body>
