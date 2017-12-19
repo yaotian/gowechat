@@ -57,3 +57,14 @@ func (user *User) GetUserInfo(openID string) (userInfo *Info, err error) {
 	err = json.Unmarshal(response, userInfo)
 	return
 }
+
+//IsSubscribed 是否已经关注公众号
+func (user *User) IsSubscribed(openID string) (subscribed bool, err error) {
+	var userInfo *Info
+	userInfo, err = user.GetUserInfo(openID)
+	if err != nil {
+		return
+	}
+	subscribed = userInfo.Subscribe == 1
+	return
+}

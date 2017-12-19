@@ -10,6 +10,9 @@ import (
 	"github.com/yaotian/gowechat/wxcontext"
 )
 
+//MemCache if wxcontext.Config no cache, this will give a default memory cache.
+var MemCache cache.Cache
+
 // Wechat struct
 type Wechat struct {
 	Context *wxcontext.Context
@@ -24,7 +27,10 @@ func NewWechat(cfg wxcontext.Config) *Wechat {
 
 func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
 	if cfg.Cache == nil {
-		cfg.Cache, _ = cache.NewCache("memory", `{"interval":60}`)
+		if MemCache == nil {
+			MemCache, _ = cache.NewCache("memory", `{"interval":60}`)
+		}
+		cfg.Cache = MemCache
 	}
 	context.Config = cfg
 
@@ -52,7 +58,7 @@ func (wc *Wechat) MchMgr() (mch *MchMgr, err error) {
 		return
 	}
 	mch = new(MchMgr)
-	mch.Wechat = *wc
+	mch.Wechat = wc
 	return
 }
 
@@ -63,7 +69,7 @@ func (wc *Wechat) MpMgr() (mp *MpMgr, err error) {
 		return
 	}
 	mp = new(MpMgr)
-	mp.Wechat = *wc
+	mp.Wechat = wc
 	return
 }
 

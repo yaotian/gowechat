@@ -7,7 +7,7 @@ import (
 
 //MchMgr mch mgt
 type MchMgr struct {
-	Wechat
+	*Wechat
 }
 
 // GetPay 基本支付api

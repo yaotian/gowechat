@@ -17,7 +17,7 @@ import (
 
 //MpMgr mp mgr
 type MpMgr struct {
-	Wechat
+	*Wechat
 }
 
 //GetAccessToken 获取access_token
