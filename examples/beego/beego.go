@@ -12,6 +12,8 @@ import (
 )
 
 var appURL = "http://localhost:8001"
+
+//配置微信参数
 var config = wxcontext.Config{
 	AppID:          "your app id",
 	AppSecret:      "your app secret",
@@ -20,17 +22,17 @@ var config = wxcontext.Config{
 }
 
 func hello(ctx *context.Context) {
-	//配置微信参数
-	wc := gowechat.NewWechat(config)
-	fmt.Println("wechat:", *wc)
 	//微信平台mp
-	mp, err := wc.MpMgr()
+	var wechat = gowechat.NewWechat(config)
+	mp, err := wechat.MpMgr()
+	fmt.Println(mp)
 	if err != nil {
 		return
 	}
 
 	// 传入request和responseWriter
 	msgHandler := mp.GetMsgHandler(ctx.Request, ctx.ResponseWriter)
+	fmt.Println(msgHandler)
 
 	//设置接收消息的处理方法
 	msgHandler.SetHandleMessageFunc(func(msg message.MixMessage) *message.Reply {
@@ -48,10 +50,8 @@ func hello(ctx *context.Context) {
 
 //wxOAuth 微信公众平台，网页授权
 func wxOAuth(ctx *context.Context) {
-	//配置微信参数
-	wc := gowechat.NewWechat(config)
-	//微信公众平台
-	mp, err := wc.MpMgr()
+	var wechat = gowechat.NewWechat(config)
+	mp, err := wechat.MpMgr()
 	if err != nil {
 		return
 	}
