@@ -19,12 +19,18 @@ type OrderInput struct {
 	TotalFee    int    //分为单位
 	IP          string
 	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
-	TradeType   string //JSAPI，NATIVE，APP
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+
+	tradeType string //JSAPI，NATIVE，APP
 }
 
-//Config jssdk支付时需要的配置
-type WxPayConfig struct {
+//SetTradeType 设置TradeType
+func (c *OrderInput) setTradeType(tradeType string) {
+	c.tradeType = tradeType
+}
+
+//WxPayInfo 统一下单后，返回的信息，这些信息是前端jssdk支付时需要的配置
+type WxPayInfo struct {
 	AppID     string `json:"appId"`
 	TimeStamp string `json:"timeStamp"`
 	NonceStr  string `json:"nonceStr"`
@@ -35,7 +41,7 @@ type WxPayConfig struct {
 }
 
 //ToString wx.chooseWXPay content
-func (c *WxPayConfig) ToString() (str string) {
+func (c *WxPayInfo) ToString() (str string) {
 	return fmt.Sprintf(`
 		timestamp: %s,
     nonceStr: '%s',
@@ -46,7 +52,7 @@ func (c *WxPayConfig) ToString() (str string) {
 }
 
 //ToJSON WeixinJSBridge  json content
-func (c *WxPayConfig) ToJSON() (str string) {
+func (c *WxPayInfo) ToJSON() (str string) {
 	js, err := json.Marshal(c)
 	if err == nil {
 		return string(js)
@@ -55,13 +61,14 @@ func (c *WxPayConfig) ToJSON() (str string) {
 }
 
 //ToMap result map[string]string
-func (c *WxPayConfig) ToMap() (m map[string]string) {
+func (c *WxPayInfo) ToMap() (m map[string]string) {
 	return c.resultMap
 }
 
 /*GetJsAPIConfig 前端JsAPI支付时,需要提交的信息
  */
-func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayConfig, err error) {
+func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayInfo, err error) {
+	order.setTradeType("JSAPI")
 	err = c.checkOrder(order)
 	if err != nil {
 		return
@@ -85,7 +92,7 @@ func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayConfig, err error) 
 	sign := base.Sign(result, c.MchAPIKey, nil)
 	result["paySign"] = sign
 
-	config = new(WxPayConfig)
+	config = new(WxPayInfo)
 	config.NonceStr = util.RandomStr(8)
 	config.TimeStamp = fmt.Sprint(time.Now().Unix())
 	config.AppID = c.AppID
@@ -95,6 +102,20 @@ func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayConfig, err error) 
 
 	config.resultMap = result
 
+	return
+}
+
+//GetNativePayQrcodePicURL native支付时二维码图片的url
+func (c *Pay) GetNativePayQrcodePicURL(order OrderInput) (qrcodeURL string, err error) {
+	order.setTradeType("NATIVE")
+	input := c.createUnifiedOrderMap(order)
+	var result map[string]string
+	if result, err = c.UnifiedOrder(input); err == nil { //有prepay_id
+		qrcodeURL = result["code_url"]
+		if len(qrcodeURL) == 0 {
+			err = fmt.Errorf("native pay Qrcode url is empty")
+		}
+	}
 	return
 }
 
@@ -124,7 +145,7 @@ func (c *Pay) createUnifiedOrderMap(order OrderInput) (input map[string]string) 
 	input["spbill_create_ip"] = order.IP            //设置APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP。
 	input["notify_url"] = order.NotifyURL           //设置接收微信支付异步通知回调地址
 
-	input["trade_type"] = order.TradeType
+	input["trade_type"] = order.tradeType
 	//设置取值如下：JSAPI，NATIVE，APP，详细说明见参数规定
 
 	if order.ProductID != "" {
@@ -140,7 +161,7 @@ func (c *Pay) createUnifiedOrderMap(order OrderInput) (input map[string]string) 
 }
 
 func (c *Pay) checkOrder(order OrderInput) (err error) {
-	tradeType := order.TradeType
+	tradeType := order.tradeType
 	if tradeType != "JSAPI" && tradeType != "APP" && tradeType != "NATIVE" {
 		return fmt.Errorf("tradeType is invalid")
 	}

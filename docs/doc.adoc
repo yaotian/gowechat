@@ -152,7 +152,7 @@ config = OrderInput{
   Body:"支付"
 }
 
-wxPayConfig, err := pay.GetJsAPIConfig(config)
+wxPayInfo, err := pay.GetJsAPIConfig(config)
 
 ----
 

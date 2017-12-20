@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/yaotian/gowechat/mp/oauth"
+	"github.com/yaotian/gowechat/mp/user"
 	"github.com/yaotian/gowechat/wxcontext"
 )
 
@@ -21,8 +22,8 @@ type PageOAuthHandler struct {
 	openIDExisting          bool
 	checkOpenIDExistingFunc func(openID string) bool
 
-	oauth.UserInfo
-	afterGetUserInfoFunc func(user oauth.UserInfo) bool
+	user.Info
+	afterGetUserInfoFunc func(user user.Info) bool
 }
 
 //NewPageOAuthHandler PageOAuthHandler初始化
@@ -66,14 +67,13 @@ handler:
 
 
 */
-func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(oauth.UserInfo) bool) {
+func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(user.Info) bool) {
 	c.afterGetUserInfoFunc = handler
 }
 
 //Handle handler
 func (c *PageOAuthHandler) Handle() (err error) {
 	code := c.Query("code")
-	state := c.Query("state")
 	c.urlNeedOAuth = c.Query("target")
 	if code != "" {
 		var acsTkn oauth.ResAccessToken
@@ -86,16 +86,12 @@ func (c *PageOAuthHandler) Handle() (err error) {
 			http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
 			return
 		}
-		if state == "base" {
-			c.Redirect(c.getCallbackURL(), "snsapi_userinfo", "userinfo")
-			return
-		}
-		c.UserInfo, err = c.GetUserInfo(acsTkn.AccessToken, openID)
+		//用 user模块的，没用oauth模板，可以获得更多信息
+		u, err := user.NewUser(c.Oauth.Context).GetUserInfo(openID)
 		if err == nil {
-			if !c.afterGetUserInfoFunc(c.UserInfo) {
+			if !c.afterGetUserInfoFunc(*u) {
 				http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
 			}
-			return
 		}
 	}
 	c.Redirect(c.getCallbackURL(), "snsapi_base", "base")
