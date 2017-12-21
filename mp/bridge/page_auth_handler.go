@@ -15,8 +15,8 @@ type PageOAuthHandler struct {
 	// *wxcontext.Context
 	*oauth.Oauth
 
-	oAuthCallbackURL string
-	urlNeedOAuth     string
+	myURLOfPageOAuthCallback string
+	myURLNeedPageOAuth       string
 
 	openID                  string
 	openIDExisting          bool
@@ -27,15 +27,15 @@ type PageOAuthHandler struct {
 }
 
 //NewPageOAuthHandler PageOAuthHandler初始化
-func NewPageOAuthHandler(context *wxcontext.Context, oAuthCallbackURL string) *PageOAuthHandler {
+func NewPageOAuthHandler(context *wxcontext.Context, myURLOfPageOAuthCallback string) *PageOAuthHandler {
 	pa := new(PageOAuthHandler)
 	pa.Oauth = oauth.NewOauth(context)
-	pa.oAuthCallbackURL = oAuthCallbackURL
+	pa.myURLOfPageOAuthCallback = myURLOfPageOAuthCallback
 	return pa
 }
 
 func (c *PageOAuthHandler) getCallbackURL() (u string) {
-	return fmt.Sprintf("%s?target=%s", c.oAuthCallbackURL, url.QueryEscape(c.urlNeedOAuth))
+	return fmt.Sprintf("%s?target=%s", c.myURLOfPageOAuthCallback, url.QueryEscape(c.myURLNeedPageOAuth))
 }
 
 /*SetFuncCheckOpenIDExisting 设置检查OpenID在您的系统中是否已经存在
@@ -74,7 +74,7 @@ func (c *PageOAuthHandler) SetFuncAfterGetUserInfo(handler func(user.Info) bool)
 //Handle handler
 func (c *PageOAuthHandler) Handle() (err error) {
 	code := c.Query("code")
-	c.urlNeedOAuth = c.Query("target")
+	c.myURLNeedPageOAuth = c.Query("target")
 	if code != "" {
 		var acsTkn oauth.ResAccessToken
 		acsTkn, err = c.GetUserAccessToken(code)
@@ -87,7 +87,7 @@ func (c *PageOAuthHandler) Handle() (err error) {
 			return
 		}
 		if existing {
-			http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
+			http.Redirect(c.Writer, c.Request, c.myURLNeedPageOAuth, 302)
 			return
 		}
 		//用 user模块的，没用oauth模板，可以获得更多信息
@@ -99,7 +99,7 @@ func (c *PageOAuthHandler) Handle() (err error) {
 		if stopNow {
 			return nil
 		}
-		http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
+		http.Redirect(c.Writer, c.Request, c.myURLNeedPageOAuth, 302)
 		return nil
 	} else {
 		//code为空时

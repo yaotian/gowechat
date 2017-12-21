@@ -63,10 +63,10 @@ func (c *MpMgr) GetMsgHandler(req *http.Request, writer http.ResponseWriter) *br
 }
 
 //GetPageOAuthHandler 网页授权
-func (c *MpMgr) GetPageOAuthHandler(req *http.Request, writer http.ResponseWriter, oAuthCallbackURL string) *bridge.PageOAuthHandler {
+func (c *MpMgr) GetPageOAuthHandler(req *http.Request, writer http.ResponseWriter, myURLOfPageOAuthCallback string) *bridge.PageOAuthHandler {
 	c.Context.Request = req
 	c.Context.Writer = writer
-	handler := bridge.NewPageOAuthHandler(c.Context, oAuthCallbackURL)
+	handler := bridge.NewPageOAuthHandler(c.Context, myURLOfPageOAuthCallback)
 	return handler
 }
 
