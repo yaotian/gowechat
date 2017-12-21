@@ -128,7 +128,8 @@ func PostMultipartForm(fields []MultipartFormField, uri string) (respBody []byte
 func NewTLSHttpClientFromContent(certContent, keyContent string) (httpClient *http.Client, err error) {
 	cert, err := tls.X509KeyPair([]byte(certContent), []byte(keyContent))
 	if err != nil {
-		return
+		fmt.Print("can not init cert...")
+		return nil, err
 	}
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{cert},
@@ -153,7 +154,8 @@ func NewTLSHttpClientFromContent(certContent, keyContent string) (httpClient *ht
 func NewTLSHttpClient(certFile, keyFile string) (httpClient *http.Client, err error) {
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
-		return
+		fmt.Print("can not init cert...")
+		return nil, err
 	}
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{cert},

@@ -64,10 +64,12 @@ func (srv *MsgHandler) Handle() error {
 			return err
 		}
 		//debug
-		//fmt.Println("request msg = ", string(srv.requestRawXMLMsg))
+		// fmt.Println("request msg = ", string(srv.requestRawXMLMsg))
 		err = srv.buildResponse(replyMsg)
 		if err == nil {
 			srv.Send()
+		} else {
+			return err
 		}
 	}
 	return nil

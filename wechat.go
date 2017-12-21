@@ -3,6 +3,7 @@ package gowechat
 
 import (
 	"fmt"
+	"net/http"
 	"sync"
 
 	"github.com/astaxie/beego/cache"
@@ -41,14 +42,19 @@ func initContext(cfg *wxcontext.Config, context *wxcontext.Context) {
 	if cfg.SslCertFilePath != "" && cfg.SslKeyFilePath != "" {
 		if client, err := util.NewTLSHttpClient(cfg.SslCertFilePath, cfg.SslKeyFilePath); err == nil {
 			context.SHTTPClient = client
+		} else {
+			fmt.Print(err)
 		}
 	}
 
 	if cfg.SslCertContent != "" && cfg.SslKeyContent != "" {
 		if client, err := util.NewTLSHttpClientFromContent(cfg.SslCertContent, cfg.SslKeyContent); err == nil {
 			context.SHTTPClient = client
+		} else {
+			fmt.Print(err)
 		}
 	}
+	context.HTTPClient = http.DefaultClient
 }
 
 //MchMgr 商户平台

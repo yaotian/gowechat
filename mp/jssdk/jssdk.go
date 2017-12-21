@@ -25,12 +25,13 @@ type Config struct {
 }
 
 //JsString wx.config中的配置
-func (c *Config) JsString() (str string) {
-	return fmt.Sprintf(`
-		appId: "%s", 
-		timestamp: '%d', 
-		nonceStr: '%s', 
-		signature: '%s',`, c.AppID, c.Timestamp, c.NonceStr, c.Signature)
+func (c *Config) ToMap() (cfg map[string]interface{}) {
+	cfg = make(map[string]interface{})
+	cfg["appId"] = c.AppID
+	cfg["timestamp"] = c.Timestamp
+	cfg["nonceStr"] = c.NonceStr
+	cfg["signature"] = c.Signature
+	return
 }
 
 // resTicket 请求jsapi_tikcet返回结果

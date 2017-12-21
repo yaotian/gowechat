@@ -11,7 +11,7 @@ var plainContentType = []string{"text/plain; charset=utf-8"}
 //Render render from bytes
 func (ctx *Context) Render(bytes []byte) {
 	//debug
-	//fmt.Println("response msg = ", string(bytes))
+	// fmt.Println("response msg = ", string(bytes))
 	ctx.Writer.WriteHeader(200)
 	_, err := ctx.Writer.Write(bytes)
 	if err != nil {
