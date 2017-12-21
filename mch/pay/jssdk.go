@@ -1,6 +1,7 @@
 package pay
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -200,4 +201,57 @@ func (c *Pay) checkOrder(order OrderInput) (err error) {
 
 	return
 
+}
+
+//CheckPayNotifyData 检查pay notify url收到的消息，是否是返回成功
+func (c *Pay) CheckPayNotifyData(data []byte) (isSuccess bool, err error) {
+	msg, err := base.ParseXMLToMap(bytes.NewReader(data))
+	if err != nil {
+		return
+	}
+	ReturnCode, ok := msg["return_code"]
+	if ReturnCode == base.ReturnCodeSuccess || !ok {
+		haveAppId := msg["appid"]
+		if haveAppId != c.AppID {
+			err = fmt.Errorf("get appid is not same as mine. AppID from response is %s. My server AppID is %s,", haveAppId, c.AppID)
+			return
+		}
+
+		haveMchId := msg["mch_id"]
+		if haveMchId != c.MchID {
+			err = fmt.Errorf("get Mch id is not same as mine. MchID from response is %s. My server MchID is %s,", haveMchId, c.MchID)
+			return
+		}
+
+		signature1, ok := msg["sign"]
+		if !ok {
+			err = fmt.Errorf("no sign got")
+			return
+		}
+
+		signature2 := base.Sign(msg, c.MchAPIKey, nil)
+
+		if signature1 != signature2 {
+			err = fmt.Errorf("Sign is not same. sige_got is %s, sign_mine is %s", signature1, signature2)
+			return
+		}
+
+		outTradeNum, ok := msg["out_trade_no"]
+		if !ok || outTradeNum == "" {
+			err = fmt.Errorf("no out_trade_no")
+			return
+		}
+
+		result_code, ok := msg["result_code"]
+		if !ok {
+			err = fmt.Errorf("no result_code")
+			return
+		}
+
+		if result_code == base.ResultCodeSuccess {
+			isSuccess = true
+		}
+	}
+
+	return
 }
