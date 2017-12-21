@@ -21,11 +21,11 @@ type Wechat struct {
 // NewWechat init
 func NewWechat(cfg wxcontext.Config) *Wechat {
 	context := new(wxcontext.Context)
-	initContext(cfg, context)
+	initContext(&cfg, context)
 	return &Wechat{context}
 }
 
-func initContext(cfg wxcontext.Config, context *wxcontext.Context) {
+func initContext(cfg *wxcontext.Config, context *wxcontext.Context) {
 	if cfg.Cache == nil {
 		if MemCache == nil {
 			MemCache, _ = cache.NewCache("memory", `{"interval":60}`)
@@ -98,10 +98,10 @@ func (wc *Wechat) checkCfgMch() (err error) {
 	if wc.Context.MchAPIKey == "" {
 		return fmt.Errorf("%s", "配置中没有MchAPIKey")
 	}
-	if wc.Context.SslCertFilePath == "" || wc.Context.SslCertContent == "" {
+	if wc.Context.SslCertFilePath == "" && wc.Context.SslCertContent == "" {
 		return fmt.Errorf("%s", "配置中没有SslCert")
 	}
-	if wc.Context.SslKeyFilePath == "" || wc.Context.SslKeyContent == "" {
+	if wc.Context.SslKeyFilePath == "" && wc.Context.SslKeyContent == "" {
 		return fmt.Errorf("%s", "配置中没有SslKey")
 	}
 	return

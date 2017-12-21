@@ -3,19 +3,11 @@ package wxcontext
 import (
 	"net/http"
 	"sync"
-
-	"github.com/astaxie/beego/cache"
 )
 
 // Context struct
 type Context struct {
-	Config
-	// AppID          string
-	// AppSecret      string
-	// Token          string
-	// EncodingAESKey string
-
-	Cache cache.Cache
+	*Config
 
 	Writer  http.ResponseWriter
 	Request *http.Request
@@ -28,10 +20,6 @@ type Context struct {
 
 	HTTPClient  *http.Client
 	SHTTPClient *http.Client //SSL client
-
-	// //商户平台APIKey
-	// MchAPIKey string
-	// MchID     string
 }
 
 // Query returns the keyed url query value if it exists

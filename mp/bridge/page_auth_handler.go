@@ -20,10 +20,10 @@ type PageOAuthHandler struct {
 
 	openID                  string
 	openIDExisting          bool
-	checkOpenIDExistingFunc func(openID string) bool
+	checkOpenIDExistingFunc func(openID string) (existing bool, stopNow bool)
 
 	user.Info
-	afterGetUserInfoFunc func(user user.Info) bool
+	afterGetUserInfoFunc func(user user.Info) (stopNow bool)
 }
 
 //NewPageOAuthHandler PageOAuthHandler初始化
@@ -50,7 +50,7 @@ handler:
 	}
 
 */
-func (c *PageOAuthHandler) SetFuncCheckOpenIDExisting(handler func(string) bool) {
+func (c *PageOAuthHandler) SetFuncCheckOpenIDExisting(handler func(string) (existing bool, stopNow bool)) {
 	c.checkOpenIDExistingFunc = handler
 }
 
@@ -82,18 +82,28 @@ func (c *PageOAuthHandler) Handle() (err error) {
 			return
 		}
 		openID := acsTkn.OpenID
-		if c.checkOpenIDExistingFunc(openID) { //系统中已经存在openID
+		existing, stopNow := c.checkOpenIDExistingFunc(openID)
+		if stopNow {
+			return
+		}
+		if existing {
 			http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
 			return
 		}
 		//用 user模块的，没用oauth模板，可以获得更多信息
 		u, err := user.NewUser(c.Oauth.Context).GetUserInfo(openID)
-		if err == nil {
-			if !c.afterGetUserInfoFunc(*u) {
-				http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
-			}
+		if err != nil {
+			return err
 		}
+		stopNow = c.afterGetUserInfoFunc(*u)
+		if stopNow {
+			return nil
+		}
+		http.Redirect(c.Writer, c.Request, c.urlNeedOAuth, 302)
+		return nil
+	} else {
+		//code为空时
+		c.Redirect(c.getCallbackURL(), "snsapi_base", "base")
 	}
-	c.Redirect(c.getCallbackURL(), "snsapi_base", "base")
 	return
 }
