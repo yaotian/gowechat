@@ -447,8 +447,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#mp">微信公众平台</a>
 <ul class="sectlevel2">
-<li><a href="#_初始化">初始化</a></li>
-<li><a href="#_消息">消息</a></li>
+<li><a href="#_1_接口参数">1.接口参数</a></li>
+<li><a href="#_2_接口参数创建接口">2.接口参数创建接口</a></li>
+<li><a href="#_3_开发消息服务器">3.开发消息服务器</a></li>
+<li><a href="#_4_消息类型">4.消息类型</a></li>
 <li><a href="#_模板消息">模板消息</a></li>
 <li><a href="#_用户">用户</a></li>
 <li><a href="#_网页授权">网页授权</a></li>
@@ -459,8 +461,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#mch">微信支付(商户平台)</a>
 <ul class="sectlevel2">
-<li><a href="#_1_接口参数">1.接口参数</a></li>
-<li><a href="#_2_接口参数创建接口">2.接口参数创建接口</a></li>
+<li><a href="#_1_接口参数_2">1.接口参数</a></li>
+<li><a href="#_2_接口参数创建接口_2">2.接口参数创建接口</a></li>
 <li><a href="#_3_订单参数">3.订单参数</a></li>
 <li><a href="#_4_订单参数创建支付数据">4.订单参数创建支付数据</a></li>
 <li><a href="#_5_生成支付_js配置">5.生成支付JS配置</a></li>
@@ -577,12 +579,192 @@ if err != nil {
 <h2 id="mp">微信公众平台</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_初始化">初始化</h3>
-
+<h3 id="_1_接口参数">1.接口参数</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key",
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_消息">消息</h3>
+<h3 id="_2_接口参数创建接口">2.接口参数创建接口</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_3_开发消息服务器">3.开发消息服务器</h3>
+<div class="paragraph">
+<p>将开发的消息服务器（http://your_domain/wx_server）接入到微信公众平台，有几个步骤</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>接入你的消息服务器时，微信公众号后台，会发信息给你的服务器，来进行验证。所以你的服务器需要知道如何处理验证消息。</p>
+</li>
+<li>
+<p>微信公众平台与你的消息服务器之间通过消息通信来进行同步合作。所以你的消息服务器需要知道如何处理消息与如何发送消息。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>本接口将复杂的过程（加密，打包，验证等等）封装了，让你只需要关心业务环节。</p>
+</div>
+<div class="paragraph">
+<p>将以下的代码，加入到你的controller中，接口自动完成上面所说的两个功能，</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+你的controller需要能接收GET与POST两种消息
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
+// 传入request和responseWriter
+msgHandler := mp.GetMsgHandler(c.Ctx.Request, c.Ctx.ResponseWriter)
+
+//设置接收消息的处理方法
+msgHandler.SetHandleMessageFunc(func(msg message.MixMessage) *message.Reply {
+  switch msg.Event {
+  case message.EventSubscribe:
+    return c.handleSubscribe(&amp;msg)
+  case message.EventScan:
+    return c.handleScan(&amp;msg)
+  case message.EventUnsubscribe:
+    return c.handleUnsubscribe(&amp;msg)
+  case message.EventClick:
+    return c.handleClick(&amp;msg)
+  case message.EventLocation:
+    return c.handleLocation(&amp;msg)
+  }
+
+  switch msg.MsgType {
+  case message.MsgTypeText:
+    //回复消息：演示回复用户发送的消息
+    text := message.NewText(msg.Content)
+    return &amp;message.Reply{message.MsgTypeText, text}
+  case message.MsgTypeImage:
+    return c.handleImage(&amp;msg)
+  }
+
+	//处理消息接收以及回复
+	err = msgHandler.Handle()
+	if err != nil {
+		beego.Error(err)
+	}
+
+})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_4_消息类型">4.消息类型</h3>
+<div class="paragraph">
+<p>消息分为以下几种：文本、图片、视频、声音、链接、坐标、图文、文章。</p>
+</div>
+<div class="sect4">
+<h5 id="_文本消息">文本消息</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">//回复消息：演示回复用户发送的消息
+text := message.NewText("your message want to be sent")
+return &amp;message.Reply{message.MsgTypeText, text}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_图片消息">图片消息</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">pic := message.NewImage("your_pic_mediaID")
+return &amp;message.Reply{message.MsgTypeImage, pic}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_视频消息">视频消息</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">video := message.NewVideo("your_mediaID", "your_title", "your_description")
+return &amp;message.Reply{message.MsgTypeVideo, video}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_声音消息">声音消息</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">voice := message.NewVoice("your_mediaID")
+return &amp;message.Reply{message.MsgTypeVoice, voice}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_链接消息">链接消息</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+微信目前不支持回复链接消息
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_坐标消息">坐标消息</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+微信目前不支持坐标消息
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_图文消息">图文消息</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">news := message.NewNews([]*Article{message.NewArticle("your_title", "your_description", "your_picURL", "your_url")})
+return &amp;message.Reply{message.MsgTypeNews, news}</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_模板消息">模板消息</h3>
@@ -614,10 +796,10 @@ if err != nil {
 <h2 id="mch">微信支付(商户平台)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_1_接口参数">1.接口参数</h3>
+<h3 id="_1_接口参数_2">1.接口参数</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-golang" data-lang="golang">var config = wxcontext.Config{
+<pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
   //微信公众平台，商户平台，需要填写的信息
 	AppID:          "your app id",
 	AppSecret:      "your app secret",
@@ -642,7 +824,7 @@ if err != nil {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_2_接口参数创建接口">2.接口参数创建接口</h3>
+<h3 id="_2_接口参数创建接口_2">2.接口参数创建接口</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-golang" data-lang="golang">wc := gowechat.NewWechat(config)
@@ -879,7 +1061,7 @@ if err != nil {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-22 16:49:07 CST
+Last updated 2017-12-22 21:08:21 CST
 </div>
 </div>
 </body>

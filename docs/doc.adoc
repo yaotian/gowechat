@@ -67,9 +67,134 @@ if err != nil {
 [[mp,mp]]
 == 微信公众平台
 
-=== 初始化
+=== 1.接口参数
+[source,go]
+----
+var config = wxcontext.Config{
+  //微信公众平台，商户平台，需要填写的信息
+	AppID:          "your app id",
+	AppSecret:      "your app secret",
+	Token:          "your token",
+	EncodingAESKey: "your encoding aes key", 
+}
+----
 
-=== 消息
+=== 2.接口参数创建接口
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+----
+
+
+=== 3.开发消息服务器
+将开发的消息服务器（http://your_domain/wx_server）接入到微信公众平台，有几个步骤
+
+1. 接入你的消息服务器时，微信公众号后台，会发信息给你的服务器，来进行验证。所以你的服务器需要知道如何处理验证消息。    
+2. 微信公众平台与你的消息服务器之间通过消息通信来进行同步合作。所以你的消息服务器需要知道如何处理消息与如何发送消息。
+
+本接口将复杂的过程（加密，打包，验证等等）封装了，让你只需要关心业务环节。
+
+将以下的代码，加入到你的controller中，接口自动完成上面所说的两个功能，
+
+NOTE: 你的controller需要能接收GET与POST两种消息
+
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+
+// 传入request和responseWriter
+msgHandler := mp.GetMsgHandler(c.Ctx.Request, c.Ctx.ResponseWriter)
+
+//设置接收消息的处理方法
+msgHandler.SetHandleMessageFunc(func(msg message.MixMessage) *message.Reply {
+  switch msg.Event {
+  case message.EventSubscribe:
+    return c.handleSubscribe(&msg)
+  case message.EventScan:
+    return c.handleScan(&msg)
+  case message.EventUnsubscribe:
+    return c.handleUnsubscribe(&msg)
+  case message.EventClick:
+    return c.handleClick(&msg)
+  case message.EventLocation:
+    return c.handleLocation(&msg)
+  }
+
+  switch msg.MsgType {
+  case message.MsgTypeText:
+    //回复消息：演示回复用户发送的消息
+    text := message.NewText(msg.Content)
+    return &message.Reply{message.MsgTypeText, text}
+  case message.MsgTypeImage:
+    return c.handleImage(&msg)
+  }
+
+	//处理消息接收以及回复
+	err = msgHandler.Handle()
+	if err != nil {
+		beego.Error(err)
+	}
+
+})
+
+----
+
+=== 4.消息类型
+消息分为以下几种：文本、图片、视频、声音、链接、坐标、图文、文章。
+
+===== 文本消息
+[source,go]
+----
+//回复消息：演示回复用户发送的消息
+text := message.NewText("your message want to be sent")
+return &message.Reply{message.MsgTypeText, text}
+----
+
+===== 图片消息
+[source,go]
+----
+pic := message.NewImage("your_pic_mediaID")
+return &message.Reply{message.MsgTypeImage, pic}
+----
+
+===== 视频消息
+[source,go]
+----
+video := message.NewVideo("your_mediaID", "your_title", "your_description")
+return &message.Reply{message.MsgTypeVideo, video}
+----
+
+===== 声音消息
+[source,go]
+----
+voice := message.NewVoice("your_mediaID")
+return &message.Reply{message.MsgTypeVoice, voice}
+----
+
+===== 链接消息
+NOTE: 微信目前不支持回复链接消息
+
+===== 坐标消息
+NOTE: 微信目前不支持坐标消息
+
+===== 图文消息
+[source,go]
+----
+news := message.NewNews([]*Article{message.NewArticle("your_title", "your_description", "your_picURL", "your_url")})
+return &message.Reply{message.MsgTypeNews, news}
+----
+
+
 
 === 模板消息
 
@@ -88,7 +213,7 @@ if err != nil {
 
 === 1.接口参数
 
-[source,golang]
+[source,go]
 ----
 var config = wxcontext.Config{
   //微信公众平台，商户平台，需要填写的信息
