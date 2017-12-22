@@ -101,7 +101,8 @@ if err != nil {
 
 将以下的代码，加入到你的controller中，接口自动完成上面所说的两个功能，
 
-NOTE: 你的controller需要能接收GET与POST两种消息
+[IMPORTANT]
+你的controller需要能接收GET与POST两种消息
 
 [source,go]
 ----
