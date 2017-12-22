@@ -85,7 +85,8 @@ if err != nil {
 
 [[mch,mch]]
 == 微信支付(商户平台)
-=== 初始化
+
+=== 1.接口参数
 
 [source,golang]
 ----
@@ -110,7 +111,12 @@ var config = wxcontext.Config{
 	MchAPIKey       string //商户平台设置的api key
   //------ End 商户平台设置
 }
+----
 
+=== 2.接口参数创建接口
+
+[source,golang]
+----
 wc := gowechat.NewWechat(config)
 //微信商户平台
 mch , err := wc.MchMgr()
@@ -119,11 +125,8 @@ if err != nil {
 }
 ----
 
-=== 订单
-
-==== 统一下单
-===== 下单前需要准备的信息
-[source,go]
+=== 3.订单参数
+[source,golang]
 ----
 type OrderInput struct {
 	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
@@ -132,29 +135,131 @@ type OrderInput struct {
 	TotalFee    int    //分为单位
 	IP          string
 	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
-	TradeType   string //JSAPI，NATIVE，APP
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+
+	tradeType   string //JSAPI，NATIVE，APP
 }
 ----
 
-===== 获取前端支付所需要的配置信息
+=== 4.订单参数创建支付数据
+
 [source,go]
 ----
+
+//接口参数
+wc := gowechat.NewWechat(config)
+
+//商户平台接口
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+
+//订单参数
+var order pay.OrderInput
+order.OpenID = your_openID
+order.Body = "购物支付"
+order.OutTradeNum = your_trade_num
+order.TotalFee = your_fee
+order.IP = your_ip
+order.NotifyURL = your_notify_URL
+----
+
+公众号支付 H5中调用jssdk支付：
+[source,go]
+----
+//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)
+----
+
+扫码支付：
+[source,go]
+----
+qrcodeImageURL, err := mch.GetPay().GetNativePayQrcodePicURL(order)
+----
+
+=== 5.生成支付JS配置
+
+==== 1.WeixinJSBridge:
+支付数据，json格式，这些数据可以传递到前端模板中使用
+[source,go]
+----
+//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)
+json := cfg.ToJSON()
+----
+
+前端的JS代码例子
+[source,javascript]
+----
+...
+WeixinJSBridge.invoke(
+       'getBrandWCPayRequest', {{$json}},
+       function(res){
+           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                // 使用以上方式判断前端返回,微信团队郑重提示：
+                // res.err_msg将在用户支付成功后返回
+                // ok，但并不保证它绝对可靠。
+           }
+       }
+   );
+...
+----
+
+==== 2.JSSDK:
+支付数据，map格式，这些数据可以传递到前端模板中使用
+[source,go]
+----
+//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)
+mapData := cfg.ToMap()
+----
+
+前端的JS代码例子
+[source,javascript]
+----
+wx.chooseWXPay({
+    timestamp: {{$timestamp}},
+    nonceStr: {{$nonceStr}},
+    package: {{$package}},
+    signType: {{$signType}},
+    paySign: {{$paySign}}, // 支付签名
+    success: function (res) {
+        // 支付成功后的回调函数
+    }
+});
+----
+
+=== 6.支付通知
+微信支付后，微信服务器会将支付结果回调到你的服务器，订单参数中设置的NotifyURL,为了安全，过来的数据需要检验正确。
+[source,go]
+----
+wc := gowechat.NewWechat(config)
 //微信商户平台
 mch , err := wc.MchMgr()
 if err != nil {
   return
 }
-pay := mch.GetPay()
 
-config = OrderInput{
-  OpenID:"openID",
-  Body:"支付"
+//回调的数据检查，例子
+req := c.Ctx.Request
+data, err := ioutil.ReadAll(req.Body)
+if err != nil {
+	return
 }
-
-wxPayInfo, err := pay.GetJsAPIConfig(config)
+isSuccess, err := mch.GetPay().CheckPayNotifyData(data)
+if err != nil {
+	return
+}
+//成功后，你自己的处理
 
 ----
+
+
+
+=== 订单
+
+==== 统一下单
 
 ==== 查询订单
 
@@ -173,9 +278,6 @@ wxPayInfo, err := pay.GetJsAPIConfig(config)
 
 === 账单
 
-=== 通知
-
-=== JSSDK
 
 [[open,open]]
 == 开放平台

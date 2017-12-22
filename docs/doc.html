@@ -459,12 +459,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#mch">微信支付(商户平台)</a>
 <ul class="sectlevel2">
-<li><a href="#_初始化_2">初始化</a></li>
+<li><a href="#_1_接口参数">1.接口参数</a></li>
+<li><a href="#_2_接口参数创建接口">2.接口参数创建接口</a></li>
+<li><a href="#_3_订单参数">3.订单参数</a></li>
+<li><a href="#_4_订单参数创建支付数据">4.订单参数创建支付数据</a></li>
+<li><a href="#_5_生成支付_js配置">5.生成支付JS配置</a></li>
+<li><a href="#_6_支付通知">6.支付通知</a></li>
 <li><a href="#_订单">订单</a></li>
 <li><a href="#_退款">退款</a></li>
 <li><a href="#_账单">账单</a></li>
-<li><a href="#_通知">通知</a></li>
-<li><a href="#_jssdk_2">JSSDK</a></li>
 </ul>
 </li>
 <li><a href="#open">开放平台</a></li>
@@ -611,7 +614,7 @@ if err != nil {
 <h2 id="mch">微信支付(商户平台)</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_初始化_2">初始化</h3>
+<h3 id="_1_接口参数">1.接口参数</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-golang" data-lang="golang">var config = wxcontext.Config{
@@ -634,9 +637,15 @@ if err != nil {
 	MchID           string //商户ID
 	MchAPIKey       string //商户平台设置的api key
   //------ End 商户平台设置
-}
-
-wc := gowechat.NewWechat(config)
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_2_接口参数创建接口">2.接口参数创建接口</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-golang" data-lang="golang">wc := gowechat.NewWechat(config)
 //微信商户平台
 mch , err := wc.MchMgr()
 if err != nil {
@@ -646,46 +655,162 @@ if err != nil {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_订单">订单</h3>
-<div class="sect3">
-<h4 id="_统一下单">统一下单</h4>
-<div class="sect4">
-<h5 id="_下单前需要准备的信息">下单前需要准备的信息</h5>
+<h3 id="_3_订单参数">3.订单参数</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">type OrderInput struct {
+<pre class="highlight"><code class="language-golang" data-lang="golang">type OrderInput struct {
 	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
 	Body        string //String(128)
 	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
 	TotalFee    int    //分为单位
 	IP          string
 	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
-	TradeType   string //JSAPI，NATIVE，APP
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+
+	tradeType   string //JSAPI，NATIVE，APP
 }</code></pre>
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_获取前端支付_所需要的配置信息">获取前端支付所需要的配置信息</h5>
+<div class="sect2">
+<h3 id="_4_订单参数创建支付数据">4.订单参数创建支付数据</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">//微信商户平台
+<pre class="highlight"><code class="language-go" data-lang="go">//接口参数
+wc := gowechat.NewWechat(config)
+
+//商户平台接口
 mch , err := wc.MchMgr()
 if err != nil {
   return
 }
-pay := mch.GetPay()
 
-config = OrderInput{
-  OpenID:"openID",
-  Body:"支付"
+//订单参数
+var order pay.OrderInput
+order.OpenID = your_openID
+order.Body = "购物支付"
+order.OutTradeNum = your_trade_num
+order.TotalFee = your_fee
+order.IP = your_ip
+order.NotifyURL = your_notify_URL</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>公众号支付 H5中调用jssdk支付：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>扫码支付：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">qrcodeImageURL, err := mch.GetPay().GetNativePayQrcodePicURL(order)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_5_生成支付_js配置">5.生成支付JS配置</h3>
+<div class="sect3">
+<h4 id="_1_weixinjsbridge">1.WeixinJSBridge:</h4>
+<div class="paragraph">
+<p>支付数据，json格式，这些数据可以传递到前端模板中使用</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)
+json := cfg.ToJSON()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前端的JS代码例子</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">...
+WeixinJSBridge.invoke(
+       'getBrandWCPayRequest', {{$json}},
+       function(res){
+           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                // 使用以上方式判断前端返回,微信团队郑重提示：
+                // res.err_msg将在用户支付成功后返回
+                // ok，但并不保证它绝对可靠。
+           }
+       }
+   );
+...</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_jssdk">2.JSSDK:</h4>
+<div class="paragraph">
+<p>支付数据，map格式，这些数据可以传递到前端模板中使用</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">//公众号支付（jssdk支付数据）
+cfg, err := mch.GetPay().GetJsAPIConfig(order)
+mapData := cfg.ToMap()</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>前端的JS代码例子</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">wx.chooseWXPay({
+    timestamp: {{$timestamp}},
+    nonceStr: {{$nonceStr}},
+    package: {{$package}},
+    signType: {{$signType}},
+    paySign: {{$paySign}}, // 支付签名
+    success: function (res) {
+        // 支付成功后的回调函数
+    }
+});</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_6_支付通知">6.支付通知</h3>
+<div class="paragraph">
+<p>微信支付后，微信服务器会将支付结果回调到你的服务器，订单参数中设置的NotifyURL,为了安全，过来的数据需要检验正确。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信商户平台
+mch , err := wc.MchMgr()
+if err != nil {
+  return
 }
 
-wxPayInfo, err := pay.GetJsAPIConfig(config)</code></pre>
+//回调的数据检查，例子
+req := c.Ctx.Request
+data, err := ioutil.ReadAll(req.Body)
+if err != nil {
+	return
+}
+isSuccess, err := mch.GetPay().CheckPayNotifyData(data)
+if err != nil {
+	return
+}
+//成功后，你自己的处理</code></pre>
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_订单">订单</h3>
+<div class="sect3">
+<h4 id="_统一下单">统一下单</h4>
+
 </div>
 <div class="sect3">
 <h4 id="_查询订单">查询订单</h4>
@@ -725,14 +850,6 @@ wxPayInfo, err := pay.GetJsAPIConfig(config)</code></pre>
 <h3 id="_账单">账单</h3>
 
 </div>
-<div class="sect2">
-<h3 id="_通知">通知</h3>
-
-</div>
-<div class="sect2">
-<h3 id="_jssdk_2">JSSDK</h3>
-
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -762,7 +879,7 @@ wxPayInfo, err := pay.GetJsAPIConfig(config)</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-18 18:54:18 CST
+Last updated 2017-12-22 16:39:26 CST
 </div>
 </div>
 </body>
