@@ -41,17 +41,6 @@ type WxPayInfo struct {
 	resultMap map[string]string
 }
 
-//ToString wx.chooseWXPay content
-func (c *WxPayInfo) ToString() (str string) {
-	return fmt.Sprintf(`
-		timestamp: %s,
-    nonceStr: '%s',
-    package: '%s',
-    signType: '%s',
-    paySign: '%s', 
-		`, c.TimeStamp, c.NonceStr, c.Package, c.SignType, c.PaySign)
-}
-
 //ToJSON WeixinJSBridge  json content
 func (c *WxPayInfo) ToJSON() (str string) {
 	js, err := json.Marshal(c)
