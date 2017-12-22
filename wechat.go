@@ -3,16 +3,14 @@ package gowechat
 
 import (
 	"fmt"
-	"net/http"
 	"sync"
 
 	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/util"
 	"github.com/yaotian/gowechat/wxcontext"
 )
 
-//MemCache if wxcontext.Config no cache, this will give a default memory cache.
-var MemCache cache.Cache
+//memCache if wxcontext.Config no cache, this will give a default memory cache.
+var memCache cache.Cache
 
 // Wechat struct
 type Wechat struct {
@@ -28,33 +26,16 @@ func NewWechat(cfg wxcontext.Config) *Wechat {
 
 func initContext(cfg *wxcontext.Config, context *wxcontext.Context) {
 	if cfg.Cache == nil {
-		if MemCache == nil {
-			MemCache, _ = cache.NewCache("memory", `{"interval":60}`)
+		if memCache == nil {
+			memCache, _ = cache.NewCache("memory", `{"interval":60}`)
 		}
-		cfg.Cache = MemCache
+		cfg.Cache = memCache
 	}
 	context.Config = cfg
 
 	context.SetAccessTokenLock(new(sync.RWMutex))
 	context.SetJsAPITicketLock(new(sync.RWMutex))
 
-	//create http client
-	if cfg.SslCertFilePath != "" && cfg.SslKeyFilePath != "" {
-		if client, err := util.NewTLSHttpClient(cfg.SslCertFilePath, cfg.SslKeyFilePath); err == nil {
-			context.SHTTPClient = client
-		} else {
-			fmt.Print(err)
-		}
-	}
-
-	if cfg.SslCertContent != "" && cfg.SslKeyContent != "" {
-		if client, err := util.NewTLSHttpClientFromContent(cfg.SslCertContent, cfg.SslKeyContent); err == nil {
-			context.SHTTPClient = client
-		} else {
-			fmt.Print(err)
-		}
-	}
-	context.HTTPClient = http.DefaultClient
 }
 
 //MchMgr 商户平台
@@ -110,5 +91,7 @@ func (wc *Wechat) checkCfgMch() (err error) {
 	if wc.Context.SslKeyFilePath == "" && wc.Context.SslKeyContent == "" {
 		return fmt.Errorf("%s", "配置中没有SslKey")
 	}
+	//初始化 http client, 有错误会出错误
+	err = wc.Context.InitHTTPClients()
 	return
 }
