@@ -1,4 +1,4 @@
-package pay
+package paytool
 
 import (
 	"errors"
@@ -11,6 +11,10 @@ import (
 )
 
 //官方文档： https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
+var (
+	//ErrNoEnoughMoney 商户平台上的余额不足，给用户发不了红包
+	ErrNoEnoughMoney = errors.New("No enough money")
+)
 
 const (
 	//SceneIDPromotion 商品促销
@@ -28,8 +32,8 @@ const (
 	//SceneIDAgentBonous 渠道分润
 	SceneIDAgentBonous = "PRODUCT_5"
 
-	//SceneIDAgentInsurance 保险回馈
-	SceneIDAgentInsurance = "PRODUCT_6"
+	//SceneIDInsurance 保险回馈
+	SceneIDInsurance = "PRODUCT_6"
 
 	//SceneIDLottery 彩票派奖
 	SceneIDLottery = "PRODUCT_7"
@@ -54,13 +58,14 @@ type RedPackInput struct {
 	SceneID string
 }
 
+//Check check input
 func (m *RedPackInput) Check() (isGood bool, err error) {
-	if input.ToOpenID == "" || input.MoneyFen == 0 || input.SendName == "" || input.Wishing == "" || input.ActName == "" || input.Remark == "" || input.IP == "" {
+	if m.ToOpenID == "" || m.MoneyFen == 0 || m.SendName == "" || m.Wishing == "" || m.ActName == "" || m.Remark == "" || m.IP == "" {
 		err = fmt.Errorf("%s", "Input有必填项没有值")
 		return
 	}
 
-	if input.MoneyFen >= 200*100 && input.SceneID == "" {
+	if m.MoneyFen >= 200*100 && m.SceneID == "" {
 		err = fmt.Errorf("%s", "大于200元的红包，必须设置SceneID")
 		return
 	}
@@ -93,31 +98,38 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 	signMap["remark"] = input.Remark
 	signMap["sign"] = base.Sign(signMap, c.MchAPIKey, nil)
 
-	respMap, err := c.SendRedPack(signMap)
+	respMap, err := c.SendRedPackRaw(signMap)
 	if err != nil {
 		return false, err
 	}
 
-	result_code, ok := respMap["result_code"]
+	resultCode, ok := respMap["result_code"]
 	if !ok {
 		err = errors.New("no result_code")
 		return false, err
 	}
 
-	if result_code != "SUCCESS" {
-		err = errors.New("result code is not success")
+	if resultCode != "SUCCESS" {
+		returnMsg, _ := respMap["return_msg"]
+		errMsg, _ := respMap["err_code_des"]
+		errCode, _ := respMap["err_code"]
+
+		if errCode == "NOTENOUGH" {
+			return false, ErrNoEnoughMoney
+		}
+
+		err = fmt.Errorf("Err:%s return_msg:%s err_code:%s err_code_des:%s", "result code is not success", returnMsg, errCode, errMsg)
 		return false, err
 	}
 
-	mch_billno, ok := respMap["mch_billno"]
+	mchBillNo, ok := respMap["mch_billno"]
 	if !ok {
 		err = errors.New("no mch_billno")
 		return false, err
 	}
 
-	if billno != mch_billno {
+	if billno != mchBillNo {
 		err = errors.New("billno is not correct")
-		beego.Error(err)
 		return false, err
 	}
 

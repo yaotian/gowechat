@@ -471,6 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_订单">订单</a></li>
 <li><a href="#_退款">退款</a></li>
 <li><a href="#_账单">账单</a></li>
+<li><a href="#_发红包">发红包</a></li>
 </ul>
 </li>
 <li><a href="#open">开放平台</a></li>
@@ -1033,6 +1034,37 @@ if err != nil {
 <h3 id="_账单">账单</h3>
 
 </div>
+<div class="sect2">
+<h3 id="_发红包">发红包</h3>
+<div class="paragraph">
+<p>前提条件：发红包前，你必须在商户平台中充值</p>
+</div>
+<div class="sect3">
+<h4 id="_1_获得接口">1. 获得接口</h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">//商户平台接口
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+payTool := mch.GetPayTool()</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_2_redpackinput">2. RedPackInput</h4>
+<div class="paragraph">
+<p>var input = paytool.RedPackInput{
+  ToOpenID:""
+}</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_3_sendredpack">3. SendRedPack</h4>
+
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1062,7 +1094,7 @@ if err != nil {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-12-25 16:52:30 CST
+Last updated 2018-01-25 20:56:27 CST
 </div>
 </div>
 </body>

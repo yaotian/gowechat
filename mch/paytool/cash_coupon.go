@@ -17,7 +17,7 @@ func NewPayTool(context *wxcontext.Context) *PayTool {
 	return payT
 }
 
-//SendRedPack 发现金红包
-func (c *PayTool) SendRedPack(req map[string]string) (resp map[string]string, err error) {
+//SendRedPackRaw 发现金红包
+func (c *PayTool) SendRedPackRaw(req map[string]string) (resp map[string]string, err error) {
 	return c.PostXML("https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack", req, true)
 }

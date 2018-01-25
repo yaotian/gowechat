@@ -405,6 +405,32 @@ if err != nil {
 
 === 账单
 
+=== 发红包
+
+前提条件：发红包前，你必须在商户平台中充值
+
+==== 1. 获得接口
+
+[source,go]
+----
+
+//商户平台接口
+mch , err := wc.MchMgr()
+if err != nil {
+  return
+}
+payTool := mch.GetPayTool()
+
+----
+
+==== 2. RedPackInput
+var input = paytool.RedPackInput{
+  ToOpenID:""
+}
+
+
+==== 3. SendRedPack
+
 
 [[open,open]]
 == 开放平台
