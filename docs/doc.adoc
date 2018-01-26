@@ -1,6 +1,6 @@
 = GoWechat使用文档
 :toc: left
-:icons: font
+//:icons: font
 
 [[install,安装]]
 == 安装
