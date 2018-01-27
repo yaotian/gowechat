@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.6.1">
 <title>GoWechat使用文档</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
 /* Remove comment around @import statement below when using as a custom stylesheet */
@@ -431,69 +430,83 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
+<li><a href="#_零_使用前阅读">零、使用前阅读</a>
+<ul class="sectlevel2">
+<li><a href="#_综述">综述</a></li>
 <li><a href="#install">安装</a></li>
-<li><a href="#use">配置</a>
-<ul class="sectlevel3">
-<li><a href="#_参数">参数</a></li>
+<li><a href="#use">配置</a></li>
 <li><a href="#_微信平台的操作接口">微信平台的操作接口</a></li>
+<li><a href="#_在框架中使用">在框架中使用</a></li>
 </ul>
 </li>
-<li><a href="#_在框架中使用">在框架中使用</a>
+<li><a href="#mp">一、微信公众平台</a>
 <ul class="sectlevel2">
-<li><a href="#_beego_中使用的例子">beego中使用的例子</a></li>
-<li><a href="#_gin中使用的例子">gin中使用的例子</a></li>
-<li><a href="#_net_http中使用的例子">net/http中使用的例子</a></li>
+<li><a href="#_概述">概述</a></li>
+<li><a href="#_1_获取接口">1.获取接口</a></li>
+<li><a href="#_2_开发消息服务器">2.开发消息服务器</a></li>
+<li><a href="#_3_网页授权">3.网页授权</a></li>
+<li><a href="#_4_模板消息">4.模板消息</a></li>
+<li><a href="#_5_二维码">5.二维码</a></li>
+<li><a href="#_6_用户">6.用户</a></li>
+<li><a href="#_7_菜单">7.菜单</a></li>
 </ul>
 </li>
-<li><a href="#mp">微信公众平台</a>
+<li><a href="#mch">二、商户平台（微信支付）</a>
 <ul class="sectlevel2">
-<li><a href="#_1_接口参数">1.接口参数</a></li>
-<li><a href="#_2_接口参数创建接口">2.接口参数创建接口</a></li>
-<li><a href="#_3_开发消息服务器">3.开发消息服务器</a></li>
-<li><a href="#_4_消息类型">4.消息类型</a></li>
-<li><a href="#_模板消息">模板消息</a></li>
-<li><a href="#_用户">用户</a></li>
-<li><a href="#_网页授权">网页授权</a></li>
-<li><a href="#_jssdk">JSSDK</a></li>
-<li><a href="#_二维码">二维码</a></li>
-<li><a href="#_菜单">菜单</a></li>
+<li><a href="#_概述_2">概述</a></li>
+<li><a href="#_1_获取接口_2">1.获取接口</a></li>
+<li><a href="#_2_支付订单">2.支付订单</a></li>
+<li><a href="#_3_为两种支付方式生成_js配置">3.为两种支付方式生成JS配置</a></li>
+<li><a href="#_4_支付通知">4.支付通知</a></li>
+<li><a href="#_5_查询订单">5.查询订单</a></li>
+<li><a href="#_6_关闭订单">6.关闭订单</a></li>
+<li><a href="#_7_退款">7.退款</a></li>
+<li><a href="#_8_账单">8.账单</a></li>
+<li><a href="#_9_发红包">9.发红包</a></li>
 </ul>
 </li>
-<li><a href="#mch">微信支付(商户平台)</a>
-<ul class="sectlevel2">
-<li><a href="#_1_接口参数_2">1.接口参数</a></li>
-<li><a href="#_2_接口参数创建接口_2">2.接口参数创建接口</a></li>
-<li><a href="#_3_订单参数">3.订单参数</a></li>
-<li><a href="#_4_订单参数创建支付数据">4.订单参数创建支付数据</a></li>
-<li><a href="#_5_生成支付_js配置">5.生成支付JS配置</a></li>
-<li><a href="#_6_支付通知">6.支付通知</a></li>
-<li><a href="#_订单">订单</a></li>
-<li><a href="#_退款">退款</a></li>
-<li><a href="#_账单">账单</a></li>
-<li><a href="#_发红包">发红包</a></li>
-</ul>
-</li>
-<li><a href="#open">开放平台</a></li>
-<li><a href="#corp">企业微信</a></li>
-<li><a href="#mini">小程序</a></li>
-<li><a href="#code">贡献代码</a></li>
+<li><a href="#open">三、开放平台</a></li>
+<li><a href="#corp">四、企业微信</a></li>
+<li><a href="#mini">五、小程序</a></li>
+<li><a href="#code">六、谁正在使用</a></li>
+<li><a href="#_七_微信官方文档参考">七、微信官方文档参考</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="install">安装</h2>
+<h2 id="_零_使用前阅读">零、使用前阅读</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_综述">综述</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/GoWechat_overview.png" alt="GoWechat overview">
+</div>
+</div>
+<div class="paragraph">
+<p>项目目标：构建一套最简单易用的微信各大平台通用golang API</p>
+</div>
+<div class="paragraph">
+<p>适用范围：可以与各种平台无缝整合，beego, gin, http （example目录提供完整的使用例子）</p>
+</div>
+<div class="paragraph">
+<p>开源地址：[Github地址](<a href="https://github.com/yaotian/gowechat" class="bare">https://github.com/yaotian/gowechat</a>)</p>
+</div>
+<div class="paragraph">
+<p>GoDoc: [GoDoc地址](<a href="https://godoc.org/github.com/yaotian/gowechat" class="bare">https://godoc.org/github.com/yaotian/gowechat</a>)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="install">安装</h3>
 <div class="literalblock">
 <div class="content">
 <pre>go get github.com/yaotian/gowechat</pre>
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="use">配置</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="use">配置</h3>
 <div class="sect3">
 <h4 id="_参数">参数</h4>
 <div class="listingblock">
@@ -513,6 +526,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 	MchID           string //商户ID
 	MchAPIKey       string //商户平台设置的api key
 }</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -545,29 +559,26 @@ if err != nil {
 </div>
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_在框架中使用">在框架中使用</h2>
-<div class="sectionbody">
 <div class="sect2">
-<h3 id="_beego_中使用的例子">beego中使用的例子</h3>
+<h3 id="_在框架中使用">在框架中使用</h3>
+<div class="sect3">
+<h4 id="_beego_中使用的例子">beego中使用的例子</h4>
 <div class="literalblock">
 <div class="content">
 <pre>./examples/beego</pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_gin中使用的例子">gin中使用的例子</h3>
+<div class="sect3">
+<h4 id="_gin中使用的例子">gin中使用的例子</h4>
 <div class="literalblock">
 <div class="content">
 <pre>./examples/gin</pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_net_http中使用的例子">net/http中使用的例子</h3>
+<div class="sect3">
+<h4 id="_net_http中使用的例子">net/http中使用的例子</h4>
 <div class="literalblock">
 <div class="content">
 <pre>./examples/http</pre>
@@ -576,11 +587,20 @@ if err != nil {
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="mp">微信公众平台</h2>
+<h2 id="mp">一、微信公众平台</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_1_接口参数">1.接口参数</h3>
+<h3 id="_概述">概述</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/GoWechat_mp.png" alt="GoWechat mp">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_1_获取接口">1.获取接口</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
@@ -589,15 +609,9 @@ if err != nil {
 	AppSecret:      "your app secret",
 	Token:          "your token",
 	EncodingAESKey: "your encoding aes key",
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_2_接口参数创建接口">2.接口参数创建接口</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+}
+
+wc := gowechat.NewWechat(config)
 //微信公众平台
 mp, err := wc.MpMgr()
 if err != nil {
@@ -607,7 +621,7 @@ if err != nil {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_3_开发消息服务器">3.开发消息服务器</h3>
+<h3 id="_2_开发消息服务器">2.开发消息服务器</h3>
 <div class="paragraph">
 <p>将开发的消息服务器（http://your_domain/wx_server）接入到微信公众平台，有几个步骤</p>
 </div>
@@ -684,9 +698,8 @@ msgHandler.SetHandleMessageFunc(func(msg message.MixMessage) *message.Reply {
 })</code></pre>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_4_消息类型">4.消息类型</h3>
+<div class="sect3">
+<h4 id="_消息类型">消息类型</h4>
 <div class="paragraph">
 <p>消息分为以下几种：文本、图片、视频、声音、链接、坐标、图文、文章。</p>
 </div>
@@ -767,37 +780,162 @@ return &amp;message.Reply{message.MsgTypeNews, news}</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_模板消息">模板消息</h3>
-
 </div>
 <div class="sect2">
-<h3 id="_用户">用户</h3>
+<h3 id="_3_网页授权">3.网页授权</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
+oauthHandler := mp.GetPageOAuthHandler(c.Ctx.Request, c.Ctx.ResponseWriter, "http://your_domain/wxoauth")
+
+oauthHandler.SetFuncCheckOpenIDExisting(func(openID string) (existing bool, stopNow bool) {
+  //看自己的系统中是否已经存在此openID的用户
+  //如果已经存在， 调用自己的Login 方法，设置cookie等，return true
+  //如果还不存在，return false, handler会自动去取用户信息
+  //your code
+  return
+})
+
+oauthHandler.SetFuncAfterGetUserInfo(func(user user.Info) (stopNow bool) {
+  //已获得用户信息，这里用信息做注册使用
+  //调用自己的Login方法，设置cookie等
+  //your code
+})
+
+oauthHandler.Handle()</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_网页授权">网页授权</h3>
+<h3 id="_4_模板消息">4.模板消息</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+api := mp.GetTemplate()
 
+tmplMsg := new(template.Message)
+tmplMsg.URL = your_url
+tmplMsg.ToUser = your_to_user_openID
+tmplMsg.TemplateID = your_templateID
+tmplMsg.Data = makeMsgMessageData("your_first", "your_subject", "your_sender_name", "your_msg_content")
+_, err = api.Send(tmplMsg)
+
+func makeMsgMessageData(first, subject, sender, remark string) (data map[string]*template.DataItem) {
+	data = make(map[string]*template.DataItem)
+	data["first"] = &amp;template.DataItem{Value: first, Color: "#173177"}
+	data["keyword1"] = &amp;template.DataItem{Value: sender, Color: "#173177"}
+	data["keyword2"] = &amp;template.DataItem{Value: subject, Color: "#173177"}
+	remark = remark + "\n如果您不想收到此通知，请点击后-&gt;[消息]-&gt;右上角的设置按钮"
+	data["remark"] = &amp;template.DataItem{Value: remark, Color: "#2eb3ff"}
+	return
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_jssdk">JSSDK</h3>
+<h3 id="_5_二维码">5.二维码</h3>
+<div class="paragraph">
+<p>支持</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>临时二维码</p>
+</li>
+<li>
+<p>永久二维码</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>输入参数支持 string， int</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
+qrResult, err := mp.GetQrcode().CreateTemporaryQRCodeWithSceneString("your_scene_string", 60)
+if err != nil {
+  return
+}
+
+qrImageURL := qrResult.ImageURL()</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_二维码">二维码</h3>
+<h3 id="_6_用户">6.用户</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
+var userInfo = new(user.Info)
+userInfo, err = mp.GetUser().GetUserInfo("your_openID")
+if err != nil {
+  return
+}</code></pre>
+</div>
+</div>
 </div>
 <div class="sect2">
-<h3 id="_菜单">菜单</h3>
+<h3 id="_7_菜单">7.菜单</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-go" data-lang="go">wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
+var btnMenus []*menu.Button
+
+btn = new(menu.Button)
+btn.Name = m.Name
+btn.SetViewButton("your_name", "your_url") //url menu
+
+btnMenus = append(btnMenus,btn)
+
+mp.GetMenu().SetMenu(btnMenus)</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="mch">微信支付(商户平台)</h2>
+<h2 id="mch">二、商户平台（微信支付）</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_1_接口参数_2">1.接口参数</h3>
+<h3 id="_概述_2">概述</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/GoWechat_mch.png" alt="GoWechat mch">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_1_获取接口_2">1.获取接口</h3>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight"><code class="language-go" data-lang="go">var config = wxcontext.Config{
@@ -810,25 +948,19 @@ return &amp;message.Reply{message.MsgTypeNews, news}</code></pre>
   //------以下是 mch商户平台需要的变量
   //
   //证书公钥，路径，内容要保证只要有一项设置
-	SslCertFilePath string //证书公钥文件的路径
-	SslCertContent  string //公钥证书的内容
+	SslCertFilePath: "your cert file path" //证书公钥文件的路径
+	SslCertContent:  "your cert content" //公钥证书的内容
 
   //私钥，路径，内容要保证只要有一项设置
-	SslKeyFilePath  string //证书私钥文件的路径
-	SslKeyContent   string //私钥证书的内容
+	SslKeyFilePath:  "your key file path" //证书私钥文件的路径
+	SslKeyContent:   "your key content" //私钥证书的内容
 
-	MchID           string //商户ID
-	MchAPIKey       string //商户平台设置的api key
+	MchID: "your mch ID"           //商户ID
+	MchAPIKey: "your mch API Key"  //商户平台设置的api key
   //------ End 商户平台设置
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_2_接口参数创建接口_2">2.接口参数创建接口</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-golang" data-lang="golang">wc := gowechat.NewWechat(config)
+}
+
+wc := gowechat.NewWechat(config)
 //微信商户平台
 mch , err := wc.MchMgr()
 if err != nil {
@@ -838,44 +970,20 @@ if err != nil {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_3_订单参数">3.订单参数</h3>
+<h3 id="_2_支付订单">2.支付订单</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-golang" data-lang="golang">type OrderInput struct {
-	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
-	Body        string //String(128)
-	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
-	TotalFee    int    //分为单位
-	IP          string
-	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
-	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+<pre class="highlight"><code class="language-golang" data-lang="golang">var order = pay.OrderInput {
+	OpenID: "your openID", //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
+	Body: "购物支付",       //String(128)
+	OutTradeNum: "your trade num", //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
+	TotalFee: your_pay_number,     //分为单位
+	IP: "your_ip",
+	NotifyURL:  "your_notify_URL", //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
+	ProductID:""    //trade_type=NATIVE时（即扫码支付），此参数必传
 
-	tradeType   string //JSAPI，NATIVE，APP
+	tradeType: "JSAPI" //JSAPI，NATIVE，APP
 }</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_4_订单参数创建支付数据">4.订单参数创建支付数据</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">//接口参数
-wc := gowechat.NewWechat(config)
-
-//商户平台接口
-mch , err := wc.MchMgr()
-if err != nil {
-  return
-}
-
-//订单参数
-var order pay.OrderInput
-order.OpenID = your_openID
-order.Body = "购物支付"
-order.OutTradeNum = your_trade_num
-order.TotalFee = your_fee
-order.IP = your_ip
-order.NotifyURL = your_notify_URL</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -897,9 +1005,9 @@ cfg, err := mch.GetPay().GetJsAPIConfig(order)</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_5_生成支付_js配置">5.生成支付JS配置</h3>
+<h3 id="_3_为两种支付方式生成_js配置">3.为两种支付方式生成JS配置</h3>
 <div class="sect3">
-<h4 id="_1_weixinjsbridge">1.WeixinJSBridge:</h4>
+<h4 id="_a_weixinjsbridge">a.WeixinJSBridge:</h4>
 <div class="paragraph">
 <p>支付数据，json格式，这些数据可以传递到前端模板中使用</p>
 </div>
@@ -931,7 +1039,7 @@ WeixinJSBridge.invoke(
 </div>
 </div>
 <div class="sect3">
-<h4 id="_2_jssdk">2.JSSDK:</h4>
+<h4 id="_b_jssdk">b.JSSDK:</h4>
 <div class="paragraph">
 <p>支付数据，map格式，这些数据可以传递到前端模板中使用</p>
 </div>
@@ -962,7 +1070,7 @@ mapData := cfg.ToMap()</code></pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_6_支付通知">6.支付通知</h3>
+<h3 id="_4_支付通知">4.支付通知</h3>
 <div class="paragraph">
 <p>微信支付后，微信服务器会将支付结果回调到你的服务器，服务器地址是在订单参数中设置的NotifyURL,为了安全，过来的数据需要检验正确。</p>
 </div>
@@ -990,13 +1098,7 @@ if err != nil {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_订单">订单</h3>
-<div class="sect3">
-<h4 id="_统一下单">统一下单</h4>
-
-</div>
-<div class="sect3">
-<h4 id="_查询订单">查询订单</h4>
+<h3 id="_5_查询订单">5.查询订单</h3>
 <div class="paragraph">
 <p>该接口提供所有微信支付订单的查询，商户可以通过该接口主动查询订单状态，完成下一步的业务逻辑。</p>
 </div>
@@ -1020,80 +1122,124 @@ if err != nil {
 </ul>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_关闭订单">关闭订单</h4>
-
-</div>
-</div>
 <div class="sect2">
-<h3 id="_退款">退款</h3>
+<h3 id="_6_关闭订单">6.关闭订单</h3>
 
 </div>
 <div class="sect2">
-<h3 id="_账单">账单</h3>
+<h3 id="_7_退款">7.退款</h3>
 
 </div>
 <div class="sect2">
-<h3 id="_发红包">发红包</h3>
+<h3 id="_8_账单">8.账单</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_9_发红包">9.发红包</h3>
 <div class="paragraph">
 <p>前提条件：发红包前，你必须在商户平台中充值</p>
 </div>
-<div class="sect3">
-<h4 id="_1_获得接口">1. 获得接口</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-go" data-lang="go">//商户平台接口
+<pre class="highlight"><code class="language-go" data-lang="go">var input paytool.RedPackInput
+input.ToOpenID = "your openID"
+input.MoneyFen = int(your_money * 100)
+input.SendName = "your send Name"
+input.ActName = "佣金提现"
+input.Wishing = "您的分销佣金"
+input.Remark = fmt.Sprintf("佣金提现 User:%s Weixin:%s", "your nickname", "your openID")
+input.IP = "your IP"
+input.SceneID = paytool.SceneIDAgentBonous
+
+//商户平台接口
 mch , err := wc.MchMgr()
 if err != nil {
   return
 }
-payTool := mch.GetPayTool()</code></pre>
+_, err = mch.GetPayTool().SendRedPack(input)</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_2_redpackinput">2. RedPackInput</h4>
+</div>
+</div>
+<div class="sect1">
+<h2 id="open">三、开放平台</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="corp">四、企业微信</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="mini">五、小程序</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="code">六、谁正在使用</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>var input = paytool.RedPackInput{
-  ToOpenID:""
-}</p>
+<p>[果真免费微社区及推广平台](<a href="http://84u6.com" class="bare">http://84u6.com</a>)</p>
 </div>
+<div class="paragraph">
+<p>[新课堂360教育云平台](<a href="http://xkt360.com" class="bare">http://xkt360.com</a>)</p>
 </div>
-<div class="sect3">
-<h4 id="_3_sendredpack">3. SendRedPack</h4>
-
-</div>
+<div class="paragraph">
+<p>如果您正在使用GoWechat，请在github内留言</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="open">开放平台</h2>
+<h2 id="_七_微信官方文档参考">七、微信官方文档参考</h2>
 <div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="corp">企业微信</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="mini">小程序</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="code">贡献代码</h2>
-<div class="sectionbody">
-
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Windtrainer workouts</caption>
+<colgroup>
+<col style="width: 6.6666%;">
+<col style="width: 26.6666%;">
+<col style="width: 66.6668%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">目录</th>
+<th class="tableblock halign-center valign-top">对应</th>
+<th class="tableblock halign-left valign-top">官方文档</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/mp</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">微信公众平台(订阅号，服务号)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[文档](<a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1445241432" class="bare">https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1445241432</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/mch</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">微信商家平台</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[文档](<a href="https://pay.weixin.qq.com/wiki/doc/api/index.html" class="bare">https://pay.weixin.qq.com/wiki/doc/api/index.html</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/open</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">微信开放平台</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[文档](<a href="https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&amp;t=resource/res_list&amp;verify=1&amp;lang=zh_CN" class="bare">https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&amp;t=resource/res_list&amp;verify=1&amp;lang=zh_CN</a>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/corp</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">微信企业号</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">[文档](<a href="http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5" class="bare">http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5</a>)</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-01-26 10:59:30 CST
+Last updated 2018-01-27 20:19:36 CST
 </div>
 </div>
 </body>

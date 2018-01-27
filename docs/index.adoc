@@ -2,12 +2,25 @@
 :toc: left
 //:icons: font
 
+== 零、使用前阅读
+
+=== 综述
+image::img/GoWechat_overview.png[]
+
+项目目标：构建一套最简单易用的微信各大平台通用golang API
+
+适用范围：可以与各种平台无缝整合，beego, gin, http （example目录提供完整的使用例子）
+
+开源地址：[Github地址](https://github.com/yaotian/gowechat)
+
+GoDoc: [GoDoc地址](https://godoc.org/github.com/yaotian/gowechat)
+
 [[install,安装]]
-== 安装
+=== 安装
   go get github.com/yaotian/gowechat
 
 [[use,使用]]
-== 配置
+=== 配置
 
 ==== 参数
 ```go
@@ -30,6 +43,7 @@ var config = wxcontext.Config{
 ```
 
 === 微信平台的操作接口
+
 
 ==== 微信公众平台
 
@@ -54,21 +68,26 @@ if err != nil {
 
 ```
 
-== 在框架中使用
+=== 在框架中使用
 
-=== beego中使用的例子
+==== beego中使用的例子
   ./examples/beego 
 
-=== gin中使用的例子
+==== gin中使用的例子
   ./examples/gin
 
-=== net/http中使用的例子 
+==== net/http中使用的例子 
   ./examples/http
 
 [[mp,mp]]
-== 微信公众平台
+== 一、微信公众平台
 
-=== 1.接口参数
+=== 概述 
+image::img/GoWechat_mp.png[]
+
+
+=== 1.获取接口
+
 [source,go]
 ----
 var config = wxcontext.Config{
@@ -78,11 +97,7 @@ var config = wxcontext.Config{
 	Token:          "your token",
 	EncodingAESKey: "your encoding aes key", 
 }
-----
 
-=== 2.接口参数创建接口
-[source,go]
-----
 wc := gowechat.NewWechat(config)
 //微信公众平台
 mp, err := wc.MpMgr()
@@ -92,7 +107,7 @@ if err != nil {
 ----
 
 
-=== 3.开发消息服务器
+=== 2.开发消息服务器
 将开发的消息服务器（http://your_domain/wx_server）接入到微信公众平台，有几个步骤
 
 1. 接入你的消息服务器时，微信公众号后台，会发信息给你的服务器，来进行验证。所以你的服务器需要知道如何处理验证消息。    
@@ -151,7 +166,7 @@ msgHandler.SetHandleMessageFunc(func(msg message.MixMessage) *message.Reply {
 
 ----
 
-=== 4.消息类型
+==== 消息类型
 消息分为以下几种：文本、图片、视频、声音、链接、坐标、图文、文章。
 
 ===== 文本消息
@@ -197,23 +212,152 @@ return &message.Reply{message.MsgTypeNews, news}
 ----
 
 
+=== 3.网页授权
 
-=== 模板消息
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
 
-=== 用户
+oauthHandler := mp.GetPageOAuthHandler(c.Ctx.Request, c.Ctx.ResponseWriter, "http://your_domain/wxoauth")
 
-=== 网页授权
+oauthHandler.SetFuncCheckOpenIDExisting(func(openID string) (existing bool, stopNow bool) {
+  //看自己的系统中是否已经存在此openID的用户
+  //如果已经存在， 调用自己的Login 方法，设置cookie等，return true
+  //如果还不存在，return false, handler会自动去取用户信息
+  //your code
+  return
+})
 
-=== JSSDK
+oauthHandler.SetFuncAfterGetUserInfo(func(user user.Info) (stopNow bool) {
+  //已获得用户信息，这里用信息做注册使用
+  //调用自己的Login方法，设置cookie等
+  //your code
+})
 
-=== 二维码
+oauthHandler.Handle()
 
-=== 菜单
+----
+
+
+
+=== 4.模板消息
+
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+api := mp.GetTemplate()
+
+tmplMsg := new(template.Message)
+tmplMsg.URL = your_url
+tmplMsg.ToUser = your_to_user_openID
+tmplMsg.TemplateID = your_templateID
+tmplMsg.Data = makeMsgMessageData("your_first", "your_subject", "your_sender_name", "your_msg_content")
+_, err = api.Send(tmplMsg)
+
+func makeMsgMessageData(first, subject, sender, remark string) (data map[string]*template.DataItem) {
+	data = make(map[string]*template.DataItem)
+	data["first"] = &template.DataItem{Value: first, Color: "#173177"}
+	data["keyword1"] = &template.DataItem{Value: sender, Color: "#173177"}
+	data["keyword2"] = &template.DataItem{Value: subject, Color: "#173177"}
+	remark = remark + "\n如果您不想收到此通知，请点击后->[消息]->右上角的设置按钮"
+	data["remark"] = &template.DataItem{Value: remark, Color: "#2eb3ff"}
+	return
+}
+
+
+----
+
+=== 5.二维码
+
+支持
+
+* 临时二维码
+* 永久二维码
+
+输入参数支持 string， int
+
+
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+
+qrResult, err := mp.GetQrcode().CreateTemporaryQRCodeWithSceneString("your_scene_string", 60)
+if err != nil {
+  return
+}
+
+qrImageURL := qrResult.ImageURL()
+
+----
+
+=== 6.用户
+
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+
+var userInfo = new(user.Info)
+userInfo, err = mp.GetUser().GetUserInfo("your_openID")
+if err != nil {
+  return
+}
+
+----
+
+=== 7.菜单
+
+[source,go]
+----
+wc := gowechat.NewWechat(config)
+//微信公众平台
+mp, err := wc.MpMgr()
+if err != nil {
+  return
+}
+
+var btnMenus []*menu.Button
+
+btn = new(menu.Button)
+btn.Name = m.Name
+btn.SetViewButton("your_name", "your_url") //url menu
+
+btnMenus = append(btnMenus,btn)
+
+mp.GetMenu().SetMenu(btnMenus)
+
+----
+
+
 
 [[mch,mch]]
-== 微信支付(商户平台)
+== 二、商户平台（微信支付）
 
-=== 1.接口参数
+=== 概述
+
+image::img/GoWechat_mch.png[]
+
+
+=== 1.获取接口
 
 [source,go]
 ----
@@ -227,23 +371,18 @@ var config = wxcontext.Config{
   //------以下是 mch商户平台需要的变量
   //
   //证书公钥，路径，内容要保证只要有一项设置
-	SslCertFilePath string //证书公钥文件的路径
-	SslCertContent  string //公钥证书的内容
+	SslCertFilePath: "your cert file path" //证书公钥文件的路径
+	SslCertContent:  "your cert content" //公钥证书的内容
 
   //私钥，路径，内容要保证只要有一项设置
-	SslKeyFilePath  string //证书私钥文件的路径
-	SslKeyContent   string //私钥证书的内容
+	SslKeyFilePath:  "your key file path" //证书私钥文件的路径
+	SslKeyContent:   "your key content" //私钥证书的内容
 
-	MchID           string //商户ID
-	MchAPIKey       string //商户平台设置的api key
+	MchID: "your mch ID"           //商户ID
+	MchAPIKey: "your mch API Key"  //商户平台设置的api key
   //------ End 商户平台设置
 }
-----
 
-=== 2.接口参数创建接口
-
-[source,golang]
-----
 wc := gowechat.NewWechat(config)
 //微信商户平台
 mch , err := wc.MchMgr()
@@ -252,44 +391,21 @@ if err != nil {
 }
 ----
 
-=== 3.订单参数
+
+=== 2.支付订单
 [source,golang]
 ----
-type OrderInput struct {
-	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
-	Body        string //String(128)
-	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
-	TotalFee    int    //分为单位
-	IP          string
-	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
-	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+var order = pay.OrderInput {
+	OpenID: "your openID", //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
+	Body: "购物支付",       //String(128)
+	OutTradeNum: "your trade num", //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
+	TotalFee: your_pay_number,     //分为单位
+	IP: "your_ip",
+	NotifyURL:  "your_notify_URL", //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
+	ProductID:""    //trade_type=NATIVE时（即扫码支付），此参数必传
 
-	tradeType   string //JSAPI，NATIVE，APP
+	tradeType: "JSAPI" //JSAPI，NATIVE，APP
 }
-----
-
-=== 4.订单参数创建支付数据
-
-[source,go]
-----
-
-//接口参数
-wc := gowechat.NewWechat(config)
-
-//商户平台接口
-mch , err := wc.MchMgr()
-if err != nil {
-  return
-}
-
-//订单参数
-var order pay.OrderInput
-order.OpenID = your_openID
-order.Body = "购物支付"
-order.OutTradeNum = your_trade_num
-order.TotalFee = your_fee
-order.IP = your_ip
-order.NotifyURL = your_notify_URL
 ----
 
 公众号支付 H5中调用jssdk支付：
@@ -305,9 +421,9 @@ cfg, err := mch.GetPay().GetJsAPIConfig(order)
 qrcodeImageURL, err := mch.GetPay().GetNativePayQrcodePicURL(order)
 ----
 
-=== 5.生成支付JS配置
+=== 3.为两种支付方式生成JS配置
 
-==== 1.WeixinJSBridge:
+==== a.WeixinJSBridge:
 支付数据，json格式，这些数据可以传递到前端模板中使用
 [source,go]
 ----
@@ -333,7 +449,7 @@ WeixinJSBridge.invoke(
 ...
 ----
 
-==== 2.JSSDK:
+==== b.JSSDK:
 支付数据，map格式，这些数据可以传递到前端模板中使用
 [source,go]
 ----
@@ -357,7 +473,7 @@ wx.chooseWXPay({
 });
 ----
 
-=== 6.支付通知
+=== 4.支付通知
 微信支付后，微信服务器会将支付结果回调到你的服务器，服务器地址是在订单参数中设置的NotifyURL,为了安全，过来的数据需要检验正确。
 [source,go]
 ----
@@ -382,13 +498,7 @@ if err != nil {
 
 ----
 
-
-
-=== 订单
-
-==== 统一下单
-
-==== 查询订单
+=== 5.查询订单
 
 该接口提供所有微信支付订单的查询，商户可以通过该接口主动查询订单状态，完成下一步的业务逻辑。
 
@@ -399,48 +509,70 @@ if err != nil {
 * 调用被扫支付API，返回USERPAYING的状态；
 * 调用关单或撤销接口API之前，需确认支付状态；
 
-==== 关闭订单
+=== 6.关闭订单
 
-=== 退款
+=== 7.退款
 
-=== 账单
+=== 8.账单
 
-=== 发红包
+=== 9.发红包
 
 前提条件：发红包前，你必须在商户平台中充值
 
-==== 1. 获得接口
-
 [source,go]
 ----
+
+var input paytool.RedPackInput
+input.ToOpenID = "your openID"
+input.MoneyFen = int(your_money * 100)
+input.SendName = "your send Name"
+input.ActName = "佣金提现"
+input.Wishing = "您的分销佣金"
+input.Remark = fmt.Sprintf("佣金提现 User:%s Weixin:%s", "your nickname", "your openID")
+input.IP = "your IP"
+input.SceneID = paytool.SceneIDAgentBonous
 
 //商户平台接口
 mch , err := wc.MchMgr()
 if err != nil {
   return
 }
-payTool := mch.GetPayTool()
+_, err = mch.GetPayTool().SendRedPack(input)
 
 ----
 
-==== 2. RedPackInput
-var input = paytool.RedPackInput{
-  ToOpenID:""
-}
-
-
-==== 3. SendRedPack
-
 
 [[open,open]]
-== 开放平台
+== 三、开放平台
 
 [[corp,corp]]
-== 企业微信
+== 四、企业微信
 
 [[mini,mini]]
-== 小程序
+== 五、小程序
 
 [[code,code]]
-== 贡献代码
+== 六、谁正在使用
 
+[果真免费微社区及推广平台](http://84u6.com)
+
+[新课堂360教育云平台](http://xkt360.com)
+
+如果您正在使用GoWechat，请在github内留言
+
+== 七、微信官方文档参考
+
+.Windtrainer workouts
+[width="100%",cols="1,^4,10",options="header"]
+|=========================================================
+|目录  | 对应     |官方文档 
+
+|/mp | 微信公众平台(订阅号，服务号)| [文档](https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1445241432) 
+
+|/mch | 微信商家平台  |  [文档](https://pay.weixin.qq.com/wiki/doc/api/index.html)
+
+|/open| 微信开放平台|   [文档](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&t=resource/res_list&verify=1&lang=zh_CN) 
+
+|/corp | 微信企业号  | [文档](http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5) 
+
+|=========================================================
