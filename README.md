@@ -20,7 +20,7 @@
 * mini 微信小程序
 
 ## Documentation
-* [中文文档](https://yaotian.github.io/gowechat/doc.html)
+* [中文文档](https://yaotian.github.io/gowechat/)
 
 ## 附录，目录所对应的平台
 
