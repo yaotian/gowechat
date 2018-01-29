@@ -7,7 +7,7 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/yaotian/gowechat"
 	"github.com/yaotian/gowechat/mp/message"
-	"github.com/yaotian/gowechat/mp/oauth"
+	"github.com/yaotian/gowechat/mp/user"
 	"github.com/yaotian/gowechat/wxcontext"
 )
 
@@ -58,14 +58,14 @@ func wxOAuth(ctx *context.Context) {
 
 	oauthHandler := mp.GetPageOAuthHandler(ctx.Request, ctx.ResponseWriter, appURL+"/oauth")
 
-	oauthHandler.SetFuncCheckOpenIDExisting(func(openID string) bool {
+	oauthHandler.SetFuncCheckOpenIDExisting(func(openID string) (existing bool, stopNow bool) {
 		//看自己的系统中是否已经存在此openID的用户
 		//如果已经存在， 调用自己的Login 方法，设置cookie等，return true
 		//如果还不存在，return false, handler会自动去取用户信息
-		return true
+		return false, true
 	})
 
-	oauthHandler.SetFuncAfterGetUserInfo(func(user oauth.UserInfo) bool {
+	oauthHandler.SetFuncAfterGetUserInfo(func(user user.Info) bool {
 		//已获得用户信息，这里用信息做注册使用
 		//调用自己的Login方法，设置cookie等
 		return false
