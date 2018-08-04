@@ -83,7 +83,7 @@ func (c *Pay) GetJsAPIConfig(order OrderInput) (config *WxPayInfo, err error) {
 	result["paySign"] = sign
 
 	config = new(WxPayInfo)
-	config.NonceStr = util.RandomStr(8)
+	config.NonceStr = nocestr
 	config.TimeStamp = fmt.Sprint(time.Now().Unix())
 	config.AppID = c.AppID
 	config.Package = "prepay_id=" + prepayID
