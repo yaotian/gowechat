@@ -56,6 +56,8 @@ type RedPackInput struct {
 
 	//非必填，但大于200元，此必填, 有8个选项可供选择
 	SceneID string
+	//非必填，活动信息
+	RiskInfo string
 }
 
 //Check check input
@@ -96,6 +98,16 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 	signMap["client_ip"] = input.IP
 	signMap["act_name"] = input.ActName
 	signMap["remark"] = input.Remark
+	
+	//非必填项, 场景id
+	if input.SceneID != "" {
+		signMap["scene_id"] = input.SceneID
+	}
+	//非必填项, 活动信息
+	if input.RiskInfo != "" {
+		signMap["risk_info"] = input.RiskInfo
+	}
+	
 	signMap["sign"] = base.Sign(signMap, c.MchAPIKey, nil)
 
 	respMap, err := c.SendRedPackRaw(signMap)
