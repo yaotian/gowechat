@@ -10,9 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/yaotian/gowechat/mp/message"
-	"github.com/yaotian/gowechat/util"
-	"github.com/yaotian/gowechat/wxcontext"
+	"github.com/uzicloud/gowechat/mp/message"
+	"github.com/uzicloud/gowechat/util"
+	"github.com/uzicloud/gowechat/wxcontext"
 )
 
 //MsgHandler struct

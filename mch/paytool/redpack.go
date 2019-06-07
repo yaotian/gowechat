@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
-	"github.com/yaotian/gowechat/mch/base"
-	"github.com/yaotian/gowechat/util"
+	"github.com/uzicloud/gowechat/mch/base"
+	"github.com/uzicloud/gowechat/util"
 )
 
 //官方文档： https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
@@ -56,6 +56,10 @@ type RedPackInput struct {
 
 	//非必填，但大于200元，此必填, 有8个选项可供选择
 	SceneID string
+	//非必填，活动信息
+	RiskInfo string
+	//商户订单号
+	BillNo string
 }
 
 //Check check input
@@ -73,19 +77,14 @@ func (m *RedPackInput) Check() (isGood bool, err error) {
 }
 
 //SendRedPack 发红包
-func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
+func (c *PayTool) SendRedPack(input RedPackInput) (bool, map[string]string, error) {
 	if isGood, err := input.Check(); !isGood {
-		return false, err
+		return false, nil, err
 	}
-
-	now := time.Now()
-	dayStr := beego.Date(now, "Ymd")
-
-	billno := c.MchID + dayStr + util.RandomStr(10)
 
 	var signMap = make(map[string]string)
 	signMap["nonce_str"] = util.RandomStr(5)
-	signMap["mch_billno"] = billno //mch_id+yyyymmdd+10位一天内不能重复的数字
+
 	signMap["mch_id"] = c.MchID
 	signMap["wxappid"] = c.AppID
 	signMap["send_name"] = input.SendName
@@ -96,17 +95,37 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 	signMap["client_ip"] = input.IP
 	signMap["act_name"] = input.ActName
 	signMap["remark"] = input.Remark
+
+	var billno string
+	if input.BillNo == "" {
+		now := time.Now()
+		dayStr := beego.Date(now, "Ymd")
+		billno = c.MchID + dayStr + util.RandomStr(10)
+	} else {
+		billno = input.BillNo
+	}
+	signMap["mch_billno"] = billno
+
+	//非必填项, 场景id
+	if input.SceneID != "" {
+		signMap["scene_id"] = input.SceneID
+	}
+	//非必填项, 活动信息
+	if input.RiskInfo != "" {
+		signMap["risk_info"] = input.RiskInfo
+	}
+
 	signMap["sign"] = base.Sign(signMap, c.MchAPIKey, nil)
 
 	respMap, err := c.SendRedPackRaw(signMap)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	resultCode, ok := respMap["result_code"]
 	if !ok {
 		err = errors.New("no result_code")
-		return false, err
+		return false, nil, err
 	}
 
 	if resultCode != "SUCCESS" {
@@ -115,23 +134,23 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 		errCode, _ := respMap["err_code"]
 
 		if errCode == "NOTENOUGH" {
-			return false, ErrNoEnoughMoney
+			return false, nil, ErrNoEnoughMoney
 		}
 
 		err = fmt.Errorf("Err:%s return_msg:%s err_code:%s err_code_des:%s", "result code is not success", returnMsg, errCode, errMsg)
-		return false, err
+		return false, nil, err
 	}
 
 	mchBillNo, ok := respMap["mch_billno"]
 	if !ok {
 		err = errors.New("no mch_billno")
-		return false, err
+		return false, nil, err
 	}
 
 	if billno != mchBillNo {
 		err = errors.New("billno is not correct")
-		return false, err
+		return false, nil, err
 	}
 
-	return true, nil
+	return true, respMap, nil
 }

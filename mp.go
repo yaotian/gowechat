@@ -5,14 +5,14 @@ package gowechat
 import (
 	"net/http"
 
-	"github.com/yaotian/gowechat/mp/account"
-	"github.com/yaotian/gowechat/mp/bridge"
-	"github.com/yaotian/gowechat/mp/jssdk"
-	"github.com/yaotian/gowechat/mp/material"
-	"github.com/yaotian/gowechat/mp/menu"
-	"github.com/yaotian/gowechat/mp/oauth"
-	"github.com/yaotian/gowechat/mp/template"
-	"github.com/yaotian/gowechat/mp/user"
+	"github.com/uzicloud/gowechat/mp/account"
+	"github.com/uzicloud/gowechat/mp/bridge"
+	"github.com/uzicloud/gowechat/mp/jssdk"
+	"github.com/uzicloud/gowechat/mp/material"
+	"github.com/uzicloud/gowechat/mp/menu"
+	"github.com/uzicloud/gowechat/mp/oauth"
+	"github.com/uzicloud/gowechat/mp/template"
+	"github.com/uzicloud/gowechat/mp/user"
 )
 
 //MpMgr mp mgr

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/yaotian/gowechat/util"
+	"github.com/uzicloud/gowechat/util"
 )
 
 // Context struct
