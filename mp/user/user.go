@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/yaotian/gowechat/mp/base"
-	"github.com/yaotian/gowechat/util"
-	"github.com/yaotian/gowechat/wxcontext"
+	"github.com/uzicloud/gowechat/mp/base"
+	"github.com/uzicloud/gowechat/util"
+	"github.com/uzicloud/gowechat/wxcontext"
 )
 
 const (

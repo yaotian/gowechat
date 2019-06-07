@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/astaxie/beego/cache"
-	"github.com/yaotian/gowechat/wxcontext"
+	"github.com/uzicloud/gowechat/wxcontext"
 )
 
 //memCache if wxcontext.Config no cache, this will give a default memory cache.

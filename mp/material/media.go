@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/yaotian/gowechat/util"
+	"github.com/uzicloud/gowechat/util"
 )
 
 //MediaType 媒体文件类型

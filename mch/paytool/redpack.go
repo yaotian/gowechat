@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
-	"github.com/yaotian/gowechat/mch/base"
-	"github.com/yaotian/gowechat/util"
+	"github.com/uzicloud/gowechat/mch/base"
+	"github.com/uzicloud/gowechat/util"
 )
 
 //官方文档： https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
@@ -98,7 +98,7 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 	signMap["client_ip"] = input.IP
 	signMap["act_name"] = input.ActName
 	signMap["remark"] = input.Remark
-	
+
 	//非必填项, 场景id
 	if input.SceneID != "" {
 		signMap["scene_id"] = input.SceneID
@@ -107,7 +107,7 @@ func (c *PayTool) SendRedPack(input RedPackInput) (isSuccess bool, err error) {
 	if input.RiskInfo != "" {
 		signMap["risk_info"] = input.RiskInfo
 	}
-	
+
 	signMap["sign"] = base.Sign(signMap, c.MchAPIKey, nil)
 
 	respMap, err := c.SendRedPackRaw(signMap)
