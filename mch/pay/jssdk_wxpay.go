@@ -16,11 +16,13 @@ import (
 type OrderInput struct {
 	OpenID      string //trade_type=JSAPI时（即公众号支付），此参数必传，此参数为微信用户在商户对应appid下的唯一标识
 	Body        string //String(128)
+	Detail      string  //String(6000) 商品详细描述，对于使用单品优惠的商户，该字段必须按照规范上传
 	OutTradeNum string //String(32) 20150806125346 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
 	TotalFee    int    //分为单位
 	IP          string
 	NotifyURL   string //异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
 	ProductID   string //trade_type=NATIVE时（即扫码支付），此参数必传
+        Attach      string //附加数据，在查询API和支付通知中原样返回，可作为自定义参数使用。
 
 	tradeType string //JSAPI，NATIVE，APP
 }
@@ -129,7 +131,8 @@ func (c *Pay) createUnifiedOrderMap(order OrderInput) (input map[string]string) 
 	input["mch_id"] = c.MchID              //设置微信支付分配的商户号
 	input["nonce_str"] = util.RandomStr(5) //设置随机字符串，不长于32位。推荐随机数生成算法
 	input["body"] = order.Body             //获取商品或支付单简要描述的值
-
+	input["detail"] = order.Detail
+	input["attach"] = order.Attach 
 	input["out_trade_no"] = order.OutTradeNum       //设置商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号
 	input["total_fee"] = util.ToStr(order.TotalFee) //设置订单总金额，只能为整数，详见支付金额
 	input["spbill_create_ip"] = order.IP            //设置APP和网页支付提交用户端ip，Native支付填调用微信支付API的机器IP。
