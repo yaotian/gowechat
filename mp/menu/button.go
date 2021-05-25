@@ -7,6 +7,8 @@ type Button struct {
 	Key        string    `json:"key,omitempty"`
 	URL        string    `json:"url,omitempty"`
 	MediaID    string    `json:"media_id,omitempty"`
+	AppID      string    `json:"appid,omitempty"`
+	PagePath   string    `json:"pagepath,omitempty"`
 	SubButtons []*Button `json:"sub_button,omitempty"`
 }
 
@@ -119,6 +121,17 @@ func (btn *Button) SetMediaIDButton(name, mediaID string) {
 //SetViewLimitedButton  设置 跳转图文消息URL 类型按钮
 func (btn *Button) SetViewLimitedButton(name, mediaID string) {
 	btn.Type = "view_limited"
+	btn.Name = name
+	btn.MediaID = mediaID
+
+	btn.Key = ""
+	btn.URL = ""
+	btn.SubButtons = nil
+}
+
+//SetminiprogramButton  设置 跳转mini类型按钮
+func (btn *Button) SetMiniButton(name, mediaID string) {
+	btn.Type = "miniprogram"
 	btn.Name = name
 	btn.MediaID = mediaID
 
